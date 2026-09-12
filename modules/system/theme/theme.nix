@@ -25,11 +25,22 @@ in {
     '';
 
     noHash = lib.removePrefix "#";
+
+    # The cursor theme named "default": what X11 apps fall back to when they
+    # don't get the theme name. Steam's web view runs in Valve's own container,
+    # which can't see /etc (so none of the settings below) but does search
+    # /run/current-system/sw/share/icons, where this ends up.
+    defaultCursor = pkgs.writeTextDir "share/icons/default/index.theme" ''
+      [Icon Theme]
+      Name=Default
+      Inherits=${theme.cursor.name}
+    '';
   in {
     environment.systemPackages = [
       pkgs.adw-gtk3
       pkgs.papirus-icon-theme
       pkgs.bibata-cursors
+      defaultCursor
     ];
 
     # GTK reads these when it can't reach dconf.
