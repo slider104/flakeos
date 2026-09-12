@@ -1,0 +1,26 @@
+# Alacritty config. Docs: https://alacritty.org/config-alacritty.html
+#
+# No colours here: alacritty.nix adds a [colors] section generated from the
+# palette (modules/system/theme/palette.nix).
+
+[window]
+padding = { x = 12, y = 12 }
+decorations = "None"
+opacity = 1.0
+
+[font]
+normal = { family = "JetBrainsMono Nerd Font", style = "Regular" }
+size = 13.0
+
+[cursor]
+style = { shape = "Beam", blinking = "Off" }
+
+[bell]
+duration = 0
+
+[scrolling]
+history = 10000
+multiplier = 5
+
+[selection]
+save_to_clipboard = true

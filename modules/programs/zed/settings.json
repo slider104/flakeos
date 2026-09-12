@@ -1,0 +1,27 @@
+// Zed defaults for flakeos. Docs: https://zed.dev/docs/configuring-zed
+//
+// Installed as ~/.config/zed/global_settings.json (a symlink the wrapper
+// refreshes every time Zed starts). Zed itself never writes this file.
+// Anything you change inside Zed goes to ~/.config/zed/settings.json and
+// overrides these defaults. To make a change permanent for every install,
+// put it here instead and rebuild.
+{
+  // Generated from the palette (see zed.nix). The darkest built-in
+  // alternative, if you ever want one: "Ayu Dark".
+  "theme": "flakeos Dark",
+
+  "ui_font_family": "Noto Sans",
+  "ui_font_size": 16,
+  "buffer_font_family": "JetBrainsMono Nerd Font",
+  "buffer_font_size": 15,
+  "terminal": {
+    "font_family": "JetBrainsMono Nerd Font"
+  },
+
+  // Updates come from nixpkgs (`nup`), not from Zed itself.
+  "auto_update": false,
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false
+  }
+}

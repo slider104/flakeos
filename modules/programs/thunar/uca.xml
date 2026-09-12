@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Thunar right-click "custom actions", installed as /etc/xdg/Thunar/uca.xml.
+  (Thunar's stock "Open Terminal Here" needs an Xfce helper we don't install.)
+  If you edit actions inside Thunar it saves its own copy to
+  ~/.config/Thunar/uca.xml, and that copy wins from then on.
+-->
+<actions>
+  <action>
+    <icon>utilities-terminal</icon>
+    <name>Open Terminal Here</name>
+    <unique-id>flakeos-open-terminal</unique-id>
+    <command>alacritty --working-directory %f</command>
+    <description>Open alacritty in this folder</description>
+    <patterns>*</patterns>
+    <startup-notify/>
+    <directories/>
+  </action>
+</actions>

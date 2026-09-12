@@ -1,0 +1,41 @@
+# zshrc for the wrapped zsh. It lives in the store and replaces ~/.zshrc,
+# which is never read. The plugins are sourced after this file (see zsh.nix).
+
+# --- History ------------------------------------------------------------------
+# ZDOTDIR is read-only (the store), so history lives in ~/.local/state.
+HISTFILE="$HOME/.local/state/zsh/history"
+[[ -d ${HISTFILE:h} ]] || mkdir -p ${HISTFILE:h}
+HISTSIZE=50000
+SAVEHIST=50000
+setopt share_history hist_ignore_all_dups hist_ignore_space
+
+# --- Completion -----------------------------------------------------------------
+autoload -Uz compinit
+[[ -d $HOME/.cache/zsh ]] || mkdir -p $HOME/.cache/zsh
+compinit -d "$HOME/.cache/zsh/zcompdump"
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+
+# --- Behaviour ------------------------------------------------------------------
+setopt auto_cd interactive_comments
+bindkey -e
+bindkey '^[[H' beginning-of-line   # Home
+bindkey '^[[F' end-of-line         # End
+bindkey '^[[3~' delete-char        # Delete
+bindkey '^[[1;5C' forward-word     # Ctrl+Right
+bindkey '^[[1;5D' backward-word    # Ctrl+Left
+
+# --- Prompt ---------------------------------------------------------------------
+# user in ~/dir $     (colours = terminal colours = the palette)
+PROMPT='%F{green}%n%f in %F{blue}%~%f %# '
+
+# --- Aliases --------------------------------------------------------------------
+alias ls='ls --color=auto'
+alias ll='ls -lah'
+alias grep='grep --color=auto'
+
+# NixOS. The flake picks the config matching this machine's hostname.
+alias nrs='sudo nixos-rebuild switch --flake ~/flakeos'           # rebuild + switch now
+alias nrb='sudo nixos-rebuild boot --flake ~/flakeos'             # rebuild, use on next boot
+alias nup='nix flake update --flake ~/flakeos && nrb'             # update inputs + rebuild
+alias ncg='sudo nix-collect-garbage --delete-older-than 14d'      # clean old generations

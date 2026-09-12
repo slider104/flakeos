@@ -1,0 +1,16 @@
+# Global git config, baked into the wrapped git (GIT_CONFIG_GLOBAL).
+# ~/.gitconfig is ignored and `git config --global` can't write here:
+# edit this file and rebuild instead.
+
+[user]
+	name = slider
+	email = matze33442@gmx.de
+
+[init]
+	defaultBranch = main
+
+[pull]
+	rebase = true
+
+[core]
+	editor = nano
