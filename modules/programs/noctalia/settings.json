@@ -10,6 +10,7 @@
       "left": [
         {
           "id": "Launcher",
+          "useDistroLogo": true,
           "enableColorization": true,
           "colorizeSystemIcon": "primary"
         },
@@ -29,6 +30,7 @@
         { "id": "Clock" },
         {
           "id": "ControlCenter",
+          "icon": "power",
           "enableColorization": true,
           "colorizeSystemIcon": "primary"
         }
