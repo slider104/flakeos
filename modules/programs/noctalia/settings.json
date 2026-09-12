@@ -8,7 +8,11 @@
     "capsuleOpacity": 0.5,
     "widgets": {
       "left": [
-        { "id": "Launcher" },
+        {
+          "id": "Launcher",
+          "enableColorization": true,
+          "colorizeSystemIcon": "primary"
+        },
         { "id": "SystemMonitor" },
         { "id": "ActiveWindow" },
         { "id": "MediaMini" }
@@ -23,7 +27,11 @@
         { "id": "Volume" },
         { "id": "Brightness" },
         { "id": "Clock" },
-        { "id": "ControlCenter" }
+        {
+          "id": "ControlCenter",
+          "enableColorization": true,
+          "colorizeSystemIcon": "primary"
+        }
       ]
     }
   },
