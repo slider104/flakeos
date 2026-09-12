@@ -132,6 +132,26 @@ delete the files whenever you like.
   images → imv, folders → Thunar, archives → xarchiver, links/PDFs → Firefox.
 - **New wallpaper:** put it in `wallpapers/`, `git add`, rebuild, then Mod+W.
 
+### Saving changes to GitHub
+
+Zed's Git panel does all of this with buttons. In a terminal:
+
+```sh
+cd ~/flakeos
+git status                     # what changed?
+git add -A                     # stage everything (new files too)
+git commit -m "what I changed"
+git push                       # upload to github.com/slider104/flakeos
+git pull                       # get changes made on the other machine
+```
+
+Pushing uses your SSH key `~/.ssh/id_ed25519`, never a password or token.
+`programs/git/gitconfig` sends pushes to GitHub over SSH, even though the
+repo was cloned with an `https://` URL, and `programs/git/git.nix` already
+trusts GitHub's host key. So once the key is on the machine, pushing from
+Zed just works. `ssh -T git@github.com` checks the key: it should answer
+"Hi slider104!".
+
 ### Keys worth knowing
 
 | key | action |
@@ -152,8 +172,8 @@ and hosts. Its README says which one to pick and the five steps to use it.
 
 > **zeus: back up first.** The install wipes the 1 TB system drive, which is
 > where `/home/slider` lives right now, including `~/flakeos` and `~/nixos`.
-> Push this repo somewhere (a private GitHub/Codeberg repo) or copy it to the
-> 2 TB data drive. The 2 TB data drive itself is never touched.
+> Push this repo to GitHub, and copy your SSH key to the 2 TB data drive
+> (`cp -r ~/.ssh /mnt/data/ssh-backup`). The data drive itself is never touched.
 
 1. Boot the NixOS ISO, connect to the network, and get the repo:
    ```sh
@@ -176,6 +196,19 @@ and hosts. Its README says which one to pick and the five steps to use it.
 6. You're logged into niri automatically. Open a terminal (Mod+Return) and:
    ```sh
    passwd                                   # initial password is "slider"
-   git clone <your-repo-url> ~/flakeos
+   git clone https://github.com/slider104/flakeos.git ~/flakeos
    ```
    Then press Mod+W to pick a wallpaper.
+7. Put your SSH key back, so you can push (see
+   [Saving changes to GitHub](#saving-changes-to-github)). Either restore
+   the backup:
+   ```sh
+   cp -r /mnt/data/ssh-backup ~/.ssh && chmod 700 ~/.ssh && chmod 600 ~/.ssh/id_ed25519
+   ```
+   or make a new key and add it on GitHub (Settings → SSH and GPG keys →
+   New SSH key, paste the line that `cat` prints):
+   ```sh
+   ssh-keygen -t ed25519 -C matze33442@gmx.de   # press Enter at every question
+   cat ~/.ssh/id_ed25519.pub
+   ```
+   Check with `ssh -T git@github.com`.

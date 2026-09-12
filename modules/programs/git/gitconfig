@@ -14,3 +14,9 @@
 
 [core]
 	editor = nano
+
+# Clone/pull GitHub repos over https (works with no key, e.g. on the ISO),
+# but push over SSH with your key (~/.ssh/id_ed25519). An https push would
+# ask for a username + token, which Zed can't answer.
+[url "git@github.com:"]
+	pushInsteadOf = https://github.com/
