@@ -6,9 +6,9 @@
 // overrides these defaults. To make a change permanent for every install,
 // put it here instead and rebuild.
 {
-  // Generated from the palette (see zed.nix). The darkest built-in
-  // alternative, if you ever want one: "Ayu Dark".
-  "theme": "flakeos Dark",
+  // Generated from the palette (see zed.nix), so it matches adw-gtk3-dark.
+  // A built-in alternative, if you ever want one: "Ayu Dark".
+  "theme": "Adwaita Dark (palette)",
 
   "ui_font_family": "Noto Sans",
   "ui_font_size": 16,

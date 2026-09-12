@@ -7,7 +7,7 @@
       polkit
       xdg
       audio
-      bluetooth
+      # bluetooth
       fonts
       theme
 

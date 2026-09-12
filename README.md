@@ -1,7 +1,7 @@
 # flakeos
 
 A minimal NixOS config for **zeus** (gaming desktop) and **hermes** (laptop):
-niri + noctalia, one very dark palette everywhere, ready for gaming. No home-manager.
+niri + noctalia, one Adwaita-dark look everywhere, ready for gaming. No home-manager.
 
 ## The three ideas
 
@@ -20,10 +20,11 @@ niri + noctalia, one very dark palette everywhere, ready for gaming. No home-man
    A side effect: every wrapped program can run on any machine with Nix,
    e.g. `nix run .#alacritty`.
 
-3. **One palette.** `modules/system/theme/palette.nix` defines every colour,
-   the fonts and the cursor. alacritty, niri, noctalia, Zed, MangoHud, imv,
-   the TTY and your RGB read from it. GTK and Qt apps use standard dark
-   Adwaita (adw-gtk3-dark).
+3. **One palette.** GTK apps use the standard adw-gtk3-dark theme, and
+   `modules/system/theme/palette.nix` holds the same Adwaita-dark colours
+   (plus fonts and cursor) for everything else: alacritty, niri, noctalia,
+   Zed, MangoHud, imv and the TTY. So it all looks like one system. (Your RGB
+   lights keep their own cyan, set in `programs/openrgb/openrgb.nix`.)
 
 ## Layout
 
@@ -86,8 +87,8 @@ Things to know about wrapped programs:
 - `git config --global` can't write; edit `programs/git/gitconfig`.
 - **Zed** can't be pointed at a config file, so its wrapper links two files
   into `~/.config/zed/` before every start: `global_settings.json` (our
-  defaults, from `programs/zed/settings.json`) and `themes/flakeos.json`
-  (generated from the palette). Zed's own `settings.json` stays yours:
+  defaults, from `programs/zed/settings.json`) and `themes/palette.json`
+  ("Adwaita Dark (palette)", generated from the palette). Zed's own `settings.json` stays yours:
   changes made in Zed are saved there and win over our defaults.
 - A wrapped program's config is the same for every user on the machine.
 
@@ -99,8 +100,13 @@ Aliases from `programs/zsh/zshrc`:
 |---|---|
 | `nrs` | `sudo nixos-rebuild switch --flake ~/flakeos`: build + switch now |
 | `nrb` | same, but only active after the next reboot |
-| `nup` | update all inputs (`flake.lock`), then `nrb` |
-| `ncg` | delete generations older than 14 days |
+| `nup` | update all inputs (`flake.lock`), then rebuild for the next boot |
+| `nck` | `nix flake check`: does the config evaluate? |
+| `ncg` | delete generations older than 30 days |
+
+Each one also saves its full output to `logs/<kind>_<date>.log` in this repo
+(e.g. `logs/rebuild_2026-09-12-14:03:22.log`). `logs/` is ignored by git;
+delete the files whenever you like.
 
 - The flake picks the config matching the hostname, so `nrs` is the same
   command on zeus and hermes.

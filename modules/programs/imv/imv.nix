@@ -1,7 +1,7 @@
 {config, ...}: let
   theme = config.theme;
   wrappers = config.flake.wrappers;
-  noHash = builtins.substring 1 6; # "#0b0b0c" -> "0b0b0c" (imv wants bare hex)
+  noHash = builtins.substring 1 6; # "#1d1d20" -> "1d1d20" (imv wants bare hex)
 in {
   # imv (image viewer), wrapped. Only a couple of settings, so they live here.
   flake.wrappers.imv = {wlib, ...}: {

@@ -2,10 +2,10 @@
   theme = config.theme;
   wrappers = config.flake.wrappers;
 
-  # A Zed theme built from the palette. Keys Zed knows but we don't set fall
-  # back to Zed's default dark theme. Theme reference:
-  # https://zed.dev/docs/extensions/themes
-  a = color: alpha: color + alpha; # "#7fc8ff" + "33" -> "#7fc8ff33" (hex alpha)
+  # A Zed theme built from the palette, so Zed matches the Adwaita-dark look
+  # of everything else. Keys Zed knows but we don't set fall back to Zed's
+  # default dark theme. Theme reference: https://zed.dev/docs/extensions/themes
+  a = color: alpha: color + alpha; # "#3584e4" + "33" -> "#3584e433" (hex alpha)
   status = name: color: {
     ${name} = color;
     "${name}.background" = a color "1a";
@@ -15,11 +15,11 @@
 
   zedTheme = {
     "$schema" = "https://zed.dev/schema/themes/v0.2.0.json";
-    name = "flakeos";
+    name = "Palette";
     author = "flakeos";
     themes = [
       {
-        name = "flakeos Dark";
+        name = "Adwaita Dark (palette)";
         appearance = "dark";
         style =
           {
@@ -41,8 +41,9 @@
             "editor.foreground" = theme.text;
             "editor.gutter.background" = theme.bg;
             "editor.subheader.background" = theme.surface;
-            "editor.active_line.background" = theme.overlay;
-            "editor.highlighted_line.background" = theme.overlay;
+            # A faint tint of the text colour, like Adwaita's own hover effect.
+            "editor.active_line.background" = a theme.text "0d";
+            "editor.highlighted_line.background" = a theme.text "0d";
             "editor.line_number" = theme.bright.black;
             "editor.active_line_number" = theme.text;
             "editor.hover_line_number" = theme.muted;
@@ -92,9 +93,9 @@
             "search.match_background" = a theme.accent "40";
             "search.active_match_background" = a theme.accent "80";
 
-            "version_control.added" = theme.normal.green;
-            "version_control.modified" = theme.normal.yellow;
-            "version_control.deleted" = theme.normal.red;
+            "version_control.added" = theme.bright.green;
+            "version_control.modified" = theme.bright.yellow;
+            "version_control.deleted" = theme.bright.red;
 
             # Zed's built-in terminal.
             "terminal.background" = theme.bg;
@@ -113,50 +114,50 @@
             syntax = {
               comment = syntax theme.muted;
               "comment.doc" = syntax theme.muted;
-              keyword = syntax theme.normal.magenta;
-              preproc = syntax theme.normal.magenta;
-              function = syntax theme.normal.blue;
-              constructor = syntax theme.normal.blue;
-              type = syntax theme.normal.yellow;
-              enum = syntax theme.normal.yellow;
-              namespace = syntax theme.normal.yellow;
-              string = syntax theme.normal.green;
-              "string.escape" = syntax theme.normal.cyan;
-              "string.regex" = syntax theme.normal.cyan;
-              "string.special" = syntax theme.normal.cyan;
-              "string.special.symbol" = syntax theme.normal.cyan;
-              number = syntax theme.normal.red;
-              boolean = syntax theme.normal.red;
-              constant = syntax theme.normal.red;
-              property = syntax theme.normal.cyan;
-              attribute = syntax theme.normal.cyan;
-              label = syntax theme.normal.cyan;
-              tag = syntax theme.normal.red;
+              keyword = syntax theme.bright.magenta;
+              preproc = syntax theme.bright.magenta;
+              function = syntax theme.bright.blue;
+              constructor = syntax theme.bright.blue;
+              type = syntax theme.bright.yellow;
+              enum = syntax theme.bright.yellow;
+              namespace = syntax theme.bright.yellow;
+              string = syntax theme.bright.green;
+              "string.escape" = syntax theme.bright.cyan;
+              "string.regex" = syntax theme.bright.cyan;
+              "string.special" = syntax theme.bright.cyan;
+              "string.special.symbol" = syntax theme.bright.cyan;
+              number = syntax theme.bright.red;
+              boolean = syntax theme.bright.red;
+              constant = syntax theme.bright.red;
+              property = syntax theme.bright.cyan;
+              attribute = syntax theme.bright.cyan;
+              label = syntax theme.bright.cyan;
+              tag = syntax theme.bright.red;
               variable = syntax theme.text;
               "variable.parameter" = syntax theme.text;
-              "variable.special" = syntax theme.normal.red;
-              operator = syntax theme.normal.cyan;
+              "variable.special" = syntax theme.bright.red;
+              operator = syntax theme.bright.cyan;
               punctuation = syntax theme.muted;
               "punctuation.bracket" = syntax theme.muted;
               "punctuation.delimiter" = syntax theme.muted;
-              "punctuation.special" = syntax theme.normal.magenta;
+              "punctuation.special" = syntax theme.bright.magenta;
               title = syntax theme.accent // {font_weight = 700;};
-              "link_text" = syntax theme.normal.blue;
-              "link_uri" = syntax theme.normal.cyan;
+              "link_text" = syntax theme.bright.blue;
+              "link_uri" = syntax theme.bright.cyan;
               emphasis = {font_style = "italic";};
               "emphasis.strong" = {font_weight = 700;};
             };
           }
           # error / warning / ... each with a matching background + border.
           // status "error" theme.error
-          // status "warning" theme.normal.yellow
-          // status "success" theme.normal.green
+          // status "warning" theme.bright.yellow
+          // status "success" theme.bright.green
           // status "info" theme.accent
           // status "hint" theme.muted
-          // status "created" theme.normal.green
-          // status "modified" theme.normal.yellow
-          // status "deleted" theme.normal.red
-          // status "conflict" theme.normal.yellow
+          // status "created" theme.bright.green
+          // status "modified" theme.bright.yellow
+          // status "deleted" theme.bright.red
+          // status "conflict" theme.bright.yellow
           // status "renamed" theme.accent
           // status "ignored" theme.bright.black
           // status "hidden" theme.bright.black
@@ -186,23 +187,23 @@ in {
   # runs a small step before every start that links two files in:
   #
   #   ~/.config/zed/global_settings.json -> settings.json next to this file
-  #   ~/.config/zed/themes/flakeos.json  -> theme generated from the palette
+  #   ~/.config/zed/themes/palette.json  -> theme generated from the palette
   #
   # Zed layers them: its defaults < global_settings.json (ours) < settings.json
-  # (yours, written by Zed's UI). So Zed starts in the flakeos theme, and
-  # changes you make in Zed still work and are saved.
+  # (yours, written by Zed's UI). So Zed starts in "Adwaita Dark (palette)",
+  # and changes you make in Zed still work and are saved.
   flake.wrappers.zed-editor = {
     wlib,
     pkgs,
     ...
   }: let
-    themeFile = pkgs.writeText "flakeos-zed-theme.json" (builtins.toJSON zedTheme);
+    themeFile = pkgs.writeText "zed-palette-theme.json" (builtins.toJSON zedTheme);
 
     linkConfig = pkgs.writeShellScript "zed-link-config" ''
       cfg="''${XDG_CONFIG_HOME:-$HOME/.config}/zed"
       mkdir -p "$cfg/themes"
       ln -sfn ${./settings.json} "$cfg/global_settings.json"
-      ln -sfn ${themeFile} "$cfg/themes/flakeos.json"
+      ln -sfn ${themeFile} "$cfg/themes/palette.json"
     '';
   in {
     imports = [wlib.modules.default];

@@ -34,8 +34,28 @@ alias ls='ls --color=auto'
 alias ll='ls -lah'
 alias grep='grep --color=auto'
 
-# NixOS. The flake picks the config matching this machine's hostname.
-alias nrs='sudo nixos-rebuild switch --flake ~/flakeos'           # rebuild + switch now
-alias nrb='sudo nixos-rebuild boot --flake ~/flakeos'             # rebuild, use on next boot
-alias nup='nix flake update --flake ~/flakeos && nrb'             # update inputs + rebuild
-alias ncg='sudo nix-collect-garbage --delete-older-than 14d'      # clean old generations
+# --- NixOS ----------------------------------------------------------------------
+# The flake picks the config matching this machine's hostname.
+# Every command shows its output as usual AND saves it to
+# ~/flakeos/logs/<kind>_<date>.log (ignored by git, delete them whenever).
+
+# nixlog <kind> <command...>: run the command, copy its output into a log.
+# Returns the command's own exit code (a plain `| tee` would always report
+# success), so `nup` only rebuilds if the update worked.
+nixlog() {
+  local kind=$1; shift
+  local log=~/flakeos/logs/${kind}_$(date +%F-%T).log
+  mkdir -p ~/flakeos/logs
+  "$@" 2>&1 | tee "$log"
+  local code=${pipestatus[1]}
+  echo "log: $log"
+  return $code
+}
+
+alias nrs='nixlog rebuild sudo nixos-rebuild switch --flake ~/flakeos'        # rebuild + switch now
+alias nrb='nixlog rebuild sudo nixos-rebuild boot --flake ~/flakeos'          # rebuild, use on next boot
+alias nck='nixlog check_flake nix flake check ~/flakeos'                      # check the config
+alias ncg='nixlog garbage_collect sudo nix-collect-garbage --delete-older-than 30d'  # clean old generations
+nup() {                                                                       # update inputs + rebuild
+  nixlog update sh -c 'nix flake update --flake ~/flakeos && sudo nixos-rebuild boot --flake ~/flakeos'
+}

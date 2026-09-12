@@ -18,11 +18,11 @@ in {
       background_color=${noHash theme.bg}
       text_color=${noHash theme.text}
       gpu_color=${noHash theme.accent}
-      cpu_color=${noHash theme.normal.cyan}
-      vram_color=${noHash theme.normal.magenta}
-      ram_color=${noHash theme.normal.magenta}
+      cpu_color=${noHash theme.bright.cyan}
+      vram_color=${noHash theme.bright.magenta}
+      ram_color=${noHash theme.bright.magenta}
       engine_color=${noHash theme.accent}
-      frametime_color=${noHash theme.normal.green}
+      frametime_color=${noHash theme.bright.green}
     '';
   in {
     imports = [wlib.modules.default];

@@ -31,9 +31,9 @@ in {
       mPrimary = theme.accent;
       mOnPrimary = theme.onAccent;
       mSecondary = theme.bright.blue;
-      mOnSecondary = theme.onAccent;
-      mTertiary = theme.normal.cyan;
-      mOnTertiary = theme.onAccent;
+      mOnSecondary = theme.bg; # dark text on the light blue
+      mTertiary = theme.bright.cyan;
+      mOnTertiary = theme.bg; # dark text on the light cyan
       mError = theme.error;
       mOnError = theme.onAccent;
       mSurface = theme.bg;
