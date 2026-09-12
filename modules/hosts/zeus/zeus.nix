@@ -25,6 +25,8 @@
         # `x-gvfs-show`: list it in Thunar's side panel under Devices (drives
         # mounted outside /media or /run/media are hidden otherwise), named
         # by `x-gvfs-name`. Both are only read by Thunar/GVfs, not by mount.
+        # GVfs doesn't notice when a rebuild changes these: log out and in,
+        # or `systemctl --user restart gvfs-udisks2-volume-monitor`.
         fileSystems."/mnt/data" = {
           device = "/dev/disk/by-uuid/0574158e-46bd-43a8-bd49-8e75304ce6f3";
           fsType = "ext4";
