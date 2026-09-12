@@ -24,7 +24,6 @@
       "right": [
         { "id": "Tray" },
         { "id": "NotificationHistory" },
-        { "id": "Battery" },
         { "id": "Volume" },
         { "id": "Brightness" },
         { "id": "Clock" },
