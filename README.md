@@ -85,9 +85,9 @@ modules = with self.nixosModules; [
 Things to know about wrapped programs:
 - Config changes need a **rebuild**. Editing `~/.config/…` does nothing.
 - Settings changed *inside* a wrapped program (btop options, noctalia's
-  settings panel) don't survive a restart. **noctalia:** try settings in the
-  GUI (Mod+Comma), run `dump-noctalia-shell`, then copy what you changed into
-  `programs/noctalia/settings.json`.
+  settings panel) don't survive a restart. For noctalia there's a command
+  that makes them permanent, see
+  [Keeping noctalia settings](#keeping-noctalia-settings).
 - `git config --global` can't write; edit `programs/git/gitconfig`.
 - **Zed** can't be pointed at a config file, so its wrapper links two files
   into `~/.config/zed/` before every start: `global_settings.json` (our
@@ -132,6 +132,38 @@ delete the files whenever you like.
   images → imv, folders → Thunar, archives → xarchiver, links/PDFs → Firefox,
   text files → Zed, office documents → LibreOffice.
 - **New wallpaper:** put it in `wallpapers/`, `git add`, rebuild, then Mod+W.
+
+### Keeping noctalia settings
+
+noctalia's settings panel (Mod+Comma) is great for trying things out, but its
+changes are gone after the next login: noctalia's real settings are
+`programs/noctalia/settings.json`, baked in at rebuild. To keep what you
+changed in the panel:
+
+```sh
+noctalia-changes          # 1. show what you changed in the panel
+noctalia-changes --save   # 2. add it to programs/noctalia/settings.json
+cd ~/flakeos && git diff  # 3. check what was added
+nrs                       # 4. rebuild: now it's permanent
+```
+
+- It shows **only what you changed** (e.g. `"bar": {"displayMode":
+  "auto_hide"}`), not noctalia's hundreds of other settings. When noctalia
+  starts, it takes a snapshot of its settings (`~/.cache/noctalia/
+  settings-at-start.json`, via its startup hook in `settings.json`), and
+  `noctalia-changes` compares against that.
+- Don't want everything it found? Run `noctalia-changes` (without
+  `--save`) and copy just the parts you want into `settings.json` by hand.
+  Or save, then undo parts with `git diff` / `git checkout`.
+- "No snapshot yet": noctalia was started before this existed. Log out and
+  back in once.
+- After `--save`, running it again shows only newer changes. A change to a
+  bar widget saves that whole section's widget list (left, center or right),
+  so that part of `settings.json` gets long; that's normal.
+- Colours are not in the panel's settings: they come from the palette
+  (`system/theme/palette.nix`).
+- The wallpaper you pick with Mod+W isn't a setting: every login starts with
+  a random one from `wallpapers/`.
 
 ### Saving changes to GitHub
 

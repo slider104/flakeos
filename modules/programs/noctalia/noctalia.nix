@@ -9,8 +9,9 @@ in {
   # the store. The settings GUI (Mod+Comma) still works for trying things out,
   # but changes are gone after a restart. To keep something:
   #   1. change it in the GUI
-  #   2. run `dump-noctalia-shell` - prints the current settings as Nix
-  #   3. copy the keys you changed into settings.json, rebuild
+  #   2. `noctalia-changes` shows what you changed
+  #   3. `noctalia-changes --save` adds that to settings.json; rebuild
+  # (see noctaliaChanges below, and the README)
   #
   # Only settings you set are here; everything else uses noctalia's defaults.
   #
@@ -85,7 +86,79 @@ in {
     };
   };
 
-  flake.nixosModules.noctalia = {pkgs, ...}: {
+  flake.nixosModules.noctalia = {pkgs, ...}: let
+    # `noctalia-changes [--save]`: what you changed in the settings GUI.
+    #
+    # When noctalia starts, its startup hook (settings.json → "hooks") runs
+    # `noctalia-changes --snapshot`, which saves noctalia's settings as they
+    # are then. Later, `noctalia-changes` compares the live settings with
+    # that snapshot and prints only what differs, as JSON in the shape of
+    # settings.json. (Comparing with settings.json itself doesn't work:
+    # noctalia fills in lots of defaults, e.g. every option of every bar
+    # widget, which would all show up as "changed".)
+    #
+    # --save merges the changes into ~/flakeos/.../settings.json and takes a
+    # new snapshot, so the next run only shows newer changes.
+    noctaliaChanges = pkgs.writeShellApplication {
+      name = "noctalia-changes";
+      runtimeInputs = [pkgs.jq]; # noctalia-shell itself comes from PATH
+      text = ''
+        snapshot="''${XDG_CACHE_HOME:-$HOME/.cache}/noctalia/settings-at-start.json"
+        repo="$HOME/flakeos/modules/programs/noctalia/settings.json"
+
+        live() { noctalia-shell ipc call state all | jq '.settings'; }
+
+        case "''${1:-}" in
+          --snapshot)
+            sleep 5 # noctalia fills in the widget defaults a moment after start
+            live > "$snapshot"
+            exit 0
+            ;;
+          "" | --save) ;;
+          *)
+            echo "usage: noctalia-changes [--save]" >&2
+            exit 1
+            ;;
+        esac
+
+        if [ ! -s "$snapshot" ]; then
+          echo "No snapshot yet. Noctalia takes one when it starts: log out and in again." >&2
+          exit 1
+        fi
+
+        # changed(new; old): only the parts of new that differ from old.
+        # Objects are compared key by key; anything else (numbers, text,
+        # lists like the bar widgets) is kept whole when it differs.
+        changes=$(live | jq --slurpfile old "$snapshot" '
+          def changed($new; $old):
+            if ($new | type) == "object" and ($old | type) == "object" then
+              reduce ($new | keys_unsorted[]) as $k ({};
+                changed($new[$k]; $old[$k]) as $c
+                | if $c == null then . else .[$k] = $c end)
+              | if . == {} then null else . end
+            elif $new == $old then null
+            else $new
+            end;
+          changed(.; $old[0]) // {}')
+
+        if [ "$changes" = "{}" ]; then
+          echo "Nothing changed in the settings GUI (since noctalia started or the last --save)."
+          exit 0
+        fi
+
+        echo "$changes"
+
+        if [ "''${1:-}" = --save ]; then
+          merged=$(jq --argjson changes "$changes" '. * $changes' "$repo")
+          printf '%s\n' "$merged" > "$repo"
+          live > "$snapshot"
+          echo
+          echo "Added to $repo."
+          echo "Check it with 'git diff', then rebuild (nrs)."
+        fi
+      '';
+    };
+  in {
     imports = [wrappers.noctalia-shell.install];
     wrappers.noctalia-shell.enable = true;
 
@@ -98,6 +171,9 @@ in {
     # Things noctalia's widgets talk to.
     services.upower.enable = true; # battery
     services.power-profiles-daemon.enable = true; # power profile toggle
-    environment.systemPackages = [pkgs.brightnessctl]; # brightness OSD / keys
+    environment.systemPackages = [
+      pkgs.brightnessctl # brightness OSD / keys
+      noctaliaChanges
+    ];
   };
 }

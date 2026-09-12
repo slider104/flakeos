@@ -42,5 +42,9 @@
   "templates": {
     "activeTemplates": [],
     "enableUserTheming": false
+  },
+  "hooks": {
+    "enabled": true,
+    "startup": "noctalia-changes --snapshot"
   }
 }
