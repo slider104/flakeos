@@ -28,6 +28,7 @@ niri + noctalia, one very dark palette everywhere, ready for gaming. No home-man
 
 ```
 wallpapers/    your wallpapers, installed to /etc/wallpapers (pick one with Mod+W)
+blueprints/    templates to copy into modules/ (not used by the system itself)
 modules/
 ├── setup/     how the flake is wired + the disk layout (not day-to-day)
 │   ├── parts.nix         flake-parts, wrapper library, `nix fmt`
@@ -123,11 +124,9 @@ Aliases from `programs/zsh/zshrc`:
 | Mod+BackSpace | overview of all key binds |
 
 ### Adding things
-- **A program:** `programs/<name>/<name>.nix` (copy `mpv/` as a template),
-  then add `<name>` to a file in `grouped/` or directly to a host.
-- **A user:** copy `users/slider.nix`, rename, add it to the host's list.
-- **A host:** copy `hosts/hermes/`, rename everything inside, fill in
-  hardware + disk.
+Start from a template in [`blueprints/`](blueprints): programs (wrapped,
+wrapped by hand, plain, from another flake), system settings, bundles, users
+and hosts. Its README says which one to pick and the five steps to use it.
 
 ## Installing (fresh)
 

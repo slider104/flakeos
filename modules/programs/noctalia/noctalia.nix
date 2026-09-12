@@ -1,8 +1,4 @@
-{
-  config,
-  self,
-  ...
-}: let
+{config, ...}: let
   theme = config.theme;
   wrappers = config.flake.wrappers;
 in {
@@ -57,7 +53,9 @@ in {
 
     # A fixed path (not a /nix/store path that changes with every new image),
     # so the remembered wallpaper stays valid across rebuilds.
-    environment.etc."wallpapers".source = "${self}/wallpapers";
+    # ../../../wallpapers = flakeos/wallpapers. A relative path copies just
+    # that folder into the store (not the whole repo).
+    environment.etc."wallpapers".source = ../../../wallpapers;
 
     # Things noctalia's widgets talk to.
     services.upower.enable = true; # battery
