@@ -6,11 +6,12 @@
       trusted-users = ["root" "@wheel"];
     };
 
-    # Delete old generations weekly (this also removes their boot entries).
+    # Delete old generations weekly. Their boot menu entries disappear at the
+    # next rebuild (`nrs`/`nrb`), not right away.
     nix.gc = {
       automatic = true;
       dates = "weekly";
-      options = "--delete-older-than 14d";
+      options = "--delete-older-than 30d";
     };
 
     # `nix shell nixpkgs#foo` uses the same nixpkgs the system was built from.

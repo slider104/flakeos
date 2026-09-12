@@ -1,7 +1,8 @@
 {lib, ...}: {
-  # THE palette. Every colour on the system comes from here: alacritty, niri,
-  # noctalia, GTK, MangoHud, btop (via the terminal), the TTY and your RGB.
-  # Change a value, rebuild, and everything follows.
+  # THE palette. Colours for alacritty, niri, noctalia, Zed, MangoHud, imv,
+  # btop (via the terminal), the TTY and your RGB come from here.
+  # Change a value, rebuild, and they all follow.
+  # (GTK and Qt apps use standard dark Adwaita instead, see theme.nix.)
   #
   # This is a flake-level option (not a NixOS one), so wrapped packages can
   # read it too: any module file can use `config.theme` at the top level.
@@ -47,7 +48,7 @@
     font = {
       sans = "Noto Sans";
       mono = "JetBrainsMono Nerd Font";
-      size = 11;
+      size = 14;
     };
 
     cursor = {

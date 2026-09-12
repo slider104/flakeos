@@ -12,6 +12,7 @@
       zsh
       git
       btop
+      fastfetch
       cli
     ];
   };

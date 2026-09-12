@@ -88,6 +88,13 @@ window-rule {
     clip-to-geometry true
 }
 
+// alacritty is see-through. niri draws the focus ring as a solid block behind
+// each window, which would shine through; this draws it only around the edge.
+window-rule {
+    match app-id=r#"^Alacritty$"#
+    draw-border-with-background false
+}
+
 // Steam main window: 90% width.
 window-rule {
     match app-id=r#"^steam$"# title=r#"^Steam$"#

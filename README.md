@@ -21,8 +21,9 @@ niri + noctalia, one very dark palette everywhere, ready for gaming. No home-man
    e.g. `nix run .#alacritty`.
 
 3. **One palette.** `modules/system/theme/palette.nix` defines every colour,
-   the fonts and the cursor. alacritty, niri, noctalia, GTK, Qt, MangoHud,
-   imv, the TTY and your RGB all read from it.
+   the fonts and the cursor. alacritty, niri, noctalia, Zed, MangoHud, imv,
+   the TTY and your RGB read from it. GTK and Qt apps use standard dark
+   Adwaita (adw-gtk3-dark).
 
 ## Layout
 

@@ -2,51 +2,17 @@
   theme = config.theme;
 in {
   # System-wide dark theme for toolkits: GTK 3/4, Qt, cursor, icons and the TTY.
-  # Wrapped programs (alacritty, niri, noctalia, ...) read the palette themselves.
+  # GTK and Qt use standard dark Adwaita; cursor, icons, fonts and the TTY come
+  # from the palette. Wrapped programs (alacritty, niri, noctalia, ...) read
+  # the palette themselves.
   flake.nixosModules.theme = {
     pkgs,
     lib,
     ...
   }: let
-    gtkThemeName = "flakeos-dark";
-
-    # Our GTK theme = adw-gtk3-dark with the palette appended. In GTK CSS the
-    # last `@define-color` of a name wins, so this repaints the whole theme.
-    paletteCss = pkgs.writeText "flakeos-palette.css" ''
-      /* flakeos palette (modules/system/theme/palette.nix) */
-      @define-color accent_color ${theme.accent};
-      @define-color accent_bg_color ${theme.accent};
-      @define-color accent_fg_color ${theme.onAccent};
-      @define-color window_bg_color ${theme.bg};
-      @define-color window_fg_color ${theme.text};
-      @define-color view_bg_color ${theme.bg};
-      @define-color view_fg_color ${theme.text};
-      @define-color headerbar_bg_color ${theme.surface};
-      @define-color headerbar_fg_color ${theme.text};
-      @define-color headerbar_backdrop_color ${theme.bg};
-      @define-color sidebar_bg_color ${theme.surface};
-      @define-color sidebar_fg_color ${theme.text};
-      @define-color sidebar_backdrop_color ${theme.surface};
-      @define-color secondary_sidebar_bg_color ${theme.surface};
-      @define-color card_bg_color ${theme.surface};
-      @define-color card_fg_color ${theme.text};
-      @define-color dialog_bg_color ${theme.surface};
-      @define-color dialog_fg_color ${theme.text};
-      @define-color popover_bg_color ${theme.surface};
-      @define-color popover_fg_color ${theme.text};
-      @define-color thumbnail_bg_color ${theme.overlay};
-      @define-color destructive_bg_color ${theme.error};
-    '';
-
-    gtkTheme = pkgs.runCommand gtkThemeName {} ''
-      mkdir -p $out/share/themes
-      cp -r --no-preserve=mode ${pkgs.adw-gtk3}/share/themes/adw-gtk3-dark $out/share/themes/${gtkThemeName}
-      cd $out/share/themes/${gtkThemeName}
-      sed -i 's/adw-gtk3-dark/${gtkThemeName}/g' index.theme
-      for css in gtk-3.0/gtk.css gtk-3.0/gtk-dark.css gtk-4.0/gtk.css gtk-4.0/gtk-dark.css; do
-        cat ${paletteCss} >> "$css"
-      done
-    '';
+    # Standard adw-gtk3-dark: the GTK 3 port of GNOME's dark Adwaita look.
+    # (It doesn't use the palette; GTK apps get Adwaita's own dark greys.)
+    gtkThemeName = "adw-gtk3-dark";
 
     settingsIni = ''
       [Settings]
@@ -61,7 +27,7 @@ in {
     noHash = lib.removePrefix "#";
   in {
     environment.systemPackages = [
-      gtkTheme
+      pkgs.adw-gtk3
       pkgs.papirus-icon-theme
       pkgs.bibata-cursors
     ];
