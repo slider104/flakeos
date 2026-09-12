@@ -3,9 +3,13 @@
   "bar": {
     "position": "top",
     "density": "default",
-    "backgroundOpacity": 1
+    "useSeparateOpacity": true,
+    "backgroundOpacity": 0
   },
   "general": {
+    "animationSpeed": 2,
+    "radiusRatio": 0.2,
+    "iRadiusRatio": 0.2,
     "lockOnSuspend": true,
     "showChangelogOnStartup": false,
     "telemetryEnabled": false
@@ -13,17 +17,19 @@
   "ui": {
     "fontDefault": "Noto Sans",
     "fontFixed": "JetBrainsMono Nerd Font",
-    "panelBackgroundOpacity": 1
+    "panelBackgroundOpacity": 1,
+    "translucentWidgets": true
   },
   "location": {
-    "name": "Berlin",
+    "name": "Gütersloh",
     "autoLocate": false,
     "use12hourFormat": false,
     "firstDayOfWeek": 1
   },
   "wallpaper": {
     "enabled": true,
-    "directory": "/etc/wallpapers"
+    "directory": "/etc/wallpapers",
+    "skipStartupTransition": true
   },
   "dock": {
     "enabled": false

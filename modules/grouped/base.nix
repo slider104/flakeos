@@ -13,6 +13,7 @@
       git
       btop
       fastfetch
+      bat
       cli
     ];
   };

@@ -18,6 +18,42 @@
     "font_family": "JetBrainsMono Nerd Font"
   },
 
+  // Nix support. Zed installs the "nix" extension by itself; the language
+  // server and formatter come from programs/nix-tools.
+  "auto_install_extensions": {
+    "nix": true
+  },
+  "languages": {
+    "Nix": {
+      // nixd only ("!nil" = don't start nil): one set of errors, not two.
+      "language_servers": ["nixd", "!nil"],
+      // Format on save with alejandra, the same as `nix fmt .`.
+      "formatter": {
+        "external": {
+          "command": "alejandra",
+          "arguments": ["--quiet", "--"]
+        }
+      }
+    }
+  },
+  "lsp": {
+    "nixd": {
+      "settings": {
+        // Where nixd learns package names and NixOS options for completion
+        // and hover docs: this flake's own nixpkgs, and zeus' options (the
+        // hosts share almost all modules). Change the path if the repo moves.
+        "nixpkgs": {
+          "expr": "import (builtins.getFlake \"/home/slider/flakeos\").inputs.nixpkgs { }"
+        },
+        "options": {
+          "nixos": {
+            "expr": "(builtins.getFlake \"/home/slider/flakeos\").nixosConfigurations.zeus.options"
+          }
+        }
+      }
+    }
+  },
+
   // Updates come from nixpkgs (`nup`), not from Zed itself.
   "auto_update": false,
   "telemetry": {

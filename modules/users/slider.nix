@@ -19,5 +19,10 @@
       # first login with `passwd`; NixOS keeps the new one from then on.
       initialPassword = "slider";
     };
+
+    # root has no password on purpose: the install ran with --no-root-passwd,
+    # which leaves root *locked* (no password can ever match, so no root login,
+    # no `su`). Admin work goes through `sudo` with slider's password (wheel).
+    # Recovery without a root password: see "Locked out?" in the README.
   };
 }

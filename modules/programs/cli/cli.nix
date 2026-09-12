@@ -8,6 +8,7 @@
       p7zip
       pciutils # lspci
       usbutils # lsusb
+      vulkan-tools # `vulkaninfo --summary`: is the GPU's Vulkan driver working?
     ];
   };
 }

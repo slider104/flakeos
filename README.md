@@ -44,11 +44,13 @@ modules/
 │   ├── alacritty/        alacritty.nix + alacritty.toml
 │   ├── zsh/              zsh.nix + zshrc
 │   ├── zed/              zed.nix (+ palette theme) + settings.json
-│   ├── git/  mpv/  mangohud/  (+ config file)    btop/  imv/  (settings inline)
-│   └── firefox/ thunar/ steam/ gamemode/ gamescope/ prismlauncher/ lutris/ openrgb/ cli/
+│   ├── git/  mpv/  mangohud/  (+ config file)    btop/  imv/  bat/  (settings inline)
+│   ├── firefox/ thunar/ steam/ gamemode/ gamescope/ prismlauncher/ lutris/ openrgb/
+│   ├── shortwave/ rnote/ rustdesk/ mediawriter/ claude-code/ fresh/
+│   └── nix-tools/ (nixd, nil, alejandra)   cli/ (small tools, no config)
 ├── grouped/   bundles a host picks from
-│   ├── base.nix          every machine: boot, nix, network, locale, zsh, git, btop, cli
-│   ├── desktop.nix       login, polkit, audio, theme, niri, noctalia, alacritty, firefox, ...
+│   ├── base.nix          every machine: boot, nix, network, locale, zsh, git, btop, bat, cli
+│   ├── desktop.nix       login, polkit, audio, theme, niri, noctalia, alacritty, firefox, zed, apps, ...
 │   └── gaming.nix        steam, gamemode, gamescope, mangohud, prismlauncher, lutris
 ├── users/
 │   └── slider.nix
@@ -72,9 +74,11 @@ modules = with self.nixosModules; [
 
 | wrapped (config baked in) | configured via NixOS options | why not wrapped |
 |---|---|---|
-| niri, noctalia, alacritty, zsh, git, btop, mpv, imv, mangohud | firefox (policies) | nixpkgs already builds a wrapped Firefox from `policies` |
+| niri, noctalia, alacritty, zsh, git, btop, mpv, imv, mangohud, bat | firefox (policies) | nixpkgs already builds a wrapped Firefox from `policies` |
 | zed (special case, see below) | | |
 | | steam, lutris, prismlauncher | they keep their own state (library, accounts) |
+| | shortwave, rnote, rustdesk, claude-code, fresh | same: stations, settings, IDs, logins are their own state |
+| | mediawriter, nix-tools, cli | nothing to configure |
 | | thunar | its settings live in xfconf, not a file |
 | | gamemode, gamescope, openrgb | system services / need special permissions |
 
@@ -113,6 +117,15 @@ delete the files whenever you like.
 - **New files must be `git add`ed**, or the flake doesn't see them (no error,
   your change is just missing). Committing isn't required.
 - Broke something? Reboot and pick an older generation in the boot menu.
+- **root is locked** (installed with `--no-root-passwd`): there is no root
+  login and no `su`; `sudo` with your own password does everything.
+- **Locked out?** A rebuild broke sudo → boot an older generation. Forgot
+  your password (passwords aren't part of generations) → boot the NixOS ISO,
+  then:
+  ```sh
+  sudo mount /dev/disk/by-partlabel/disk-main-root /mnt
+  sudo nixos-enter --root /mnt -c 'passwd slider'
+  ```
 - `nix fmt .` formats all Nix files.
 - **Default apps** (which program opens which file type) are set in each
   program's module via `xdg.mime.defaultApplications`: videos/audio → mpv,
@@ -153,8 +166,7 @@ and hosts. Its README says which one to pick and the five steps to use it.
    `nixos-generate-config --show-hardware-config --no-filesystems`), then `git add -A`.
 4. Partition, format and mount (**erases that disk**):
    ```sh
-   sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- \
-     --mode destroy,format,mount --flake .#zeus
+   sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode destroy,format,mount --flake .#zeus
    ```
 5. Install and reboot:
    ```sh

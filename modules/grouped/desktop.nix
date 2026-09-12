@@ -17,9 +17,16 @@
       alacritty
       firefox
       zed
+      fresh
+      nix-tools # nixd, nil, alejandra for the editors
+      claude-code
       thunar
       mpv
       imv
+      shortwave
+      rnote
+      rustdesk
+      mediawriter
     ];
   };
 }

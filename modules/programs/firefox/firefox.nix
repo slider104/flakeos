@@ -21,10 +21,20 @@
         DontCheckDefaultBrowser = true;
         OfferToSaveLogins = false;
 
-        # uBlock Origin, installed and kept up to date automatically.
-        ExtensionSettings."uBlock0@raymondhill.net" = {
-          installation_mode = "force_installed";
-          install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
+        # Extensions, installed and kept up to date automatically. The key is
+        # the extension's ID; the URL's slug is its addons.mozilla.org name.
+        ExtensionSettings = {
+          # uBlock Origin: ad and tracker blocker.
+          "uBlock0@raymondhill.net" = {
+            installation_mode = "force_installed";
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
+          };
+          # Dark Reader: makes sites without a dark mode dark too.
+          # Its own settings (per-site toggles etc.) live in your profile.
+          "addon@darkreader.org" = {
+            installation_mode = "force_installed";
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/darkreader/latest.xpi";
+          };
         };
 
         # Dark browser UI and dark websites (where the site supports it).
