@@ -5,7 +5,27 @@
     "density": "default",
     "useSeparateOpacity": true,
     "backgroundOpacity": 0,
-    "capsuleOpacity": 0.5
+    "capsuleOpacity": 0.5,
+    "widgets": {
+      "left": [
+        { "id": "Launcher" },
+        { "id": "SystemMonitor" },
+        { "id": "ActiveWindow" },
+        { "id": "MediaMini" }
+      ],
+      "center": [
+        { "id": "Workspace" }
+      ],
+      "right": [
+        { "id": "Tray" },
+        { "id": "NotificationHistory" },
+        { "id": "Battery" },
+        { "id": "Volume" },
+        { "id": "Brightness" },
+        { "id": "Clock" },
+        { "id": "ControlCenter" }
+      ]
+    }
   },
   "general": {
     "animationSpeed": 2,
