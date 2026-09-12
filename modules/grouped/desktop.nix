@@ -25,6 +25,7 @@
       imv
       shortwave
       rnote
+      libreoffice
       rustdesk
       mediawriter
     ];

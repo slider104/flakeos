@@ -215,5 +215,8 @@ in {
   flake.nixosModules.zed = {
     imports = [wrappers.zed-editor.install];
     wrappers.zed-editor.enable = true;
+
+    # Double-clicking a .txt opens Zed (LibreOffice Writer claims them too).
+    xdg.mime.defaultApplications."text/plain" = "dev.zed.Zed.desktop";
   };
 }

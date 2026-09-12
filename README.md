@@ -46,7 +46,7 @@ modules/
 │   ├── zed/              zed.nix (+ palette theme) + settings.json
 │   ├── git/  mpv/  mangohud/  (+ config file)    btop/  imv/  bat/  (settings inline)
 │   ├── firefox/ thunar/ steam/ gamemode/ gamescope/ prismlauncher/ lutris/ openrgb/
-│   ├── shortwave/ rnote/ rustdesk/ mediawriter/ claude-code/ fresh/
+│   ├── shortwave/ rnote/ libreoffice/ rustdesk/ mediawriter/ claude-code/ fresh/
 │   └── nix-tools/ (nixd, nil, alejandra)   cli/ (small tools, no config)
 ├── grouped/   bundles a host picks from
 │   ├── base.nix          every machine: boot, nix, network, locale, zsh, git, btop, bat, cli
@@ -77,7 +77,7 @@ modules = with self.nixosModules; [
 | niri, noctalia, alacritty, zsh, git, btop, mpv, imv, mangohud, bat | firefox (policies) | nixpkgs already builds a wrapped Firefox from `policies` |
 | zed (special case, see below) | | |
 | | steam, lutris, prismlauncher | they keep their own state (library, accounts) |
-| | shortwave, rnote, rustdesk, claude-code, fresh | same: stations, settings, IDs, logins are their own state |
+| | shortwave, rnote, libreoffice, rustdesk, claude-code, fresh | same: stations, settings, IDs, logins are their own state |
 | | mediawriter, nix-tools, cli | nothing to configure |
 | | thunar | its settings live in xfconf, not a file |
 | | gamemode, gamescope, openrgb | system services / need special permissions |
@@ -129,7 +129,8 @@ delete the files whenever you like.
 - `nix fmt .` formats all Nix files.
 - **Default apps** (which program opens which file type) are set in each
   program's module via `xdg.mime.defaultApplications`: videos/audio → mpv,
-  images → imv, folders → Thunar, archives → xarchiver, links/PDFs → Firefox.
+  images → imv, folders → Thunar, archives → xarchiver, links/PDFs → Firefox,
+  text files → Zed, office documents → LibreOffice.
 - **New wallpaper:** put it in `wallpapers/`, `git add`, rebuild, then Mod+W.
 
 ### Saving changes to GitHub
