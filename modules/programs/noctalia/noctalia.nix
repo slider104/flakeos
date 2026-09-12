@@ -15,14 +15,52 @@ in {
   # Only settings you set are here; everything else uses noctalia's defaults.
   #
   # Wallpapers: the images in flakeos/wallpapers/ (repo root) are installed to
-  # /etc/wallpapers. Pick one with Mod+W; your choice is remembered in
-  # ~/.cache/noctalia. To add one, drop the file in, `git add` it, rebuild.
+  # /etc/wallpapers. Every login starts with a random one (see prepareStart);
+  # Mod+W picks another until the next login. To add one, drop the file in,
+  # `git add` it, rebuild.
   flake.wrappers.noctalia-shell = {
     wlib,
     lib,
+    pkgs,
     ...
-  }: {
+  }: let
+    # Runs before noctalia starts. It writes two files in ~/.cache/noctalia
+    # (the only place noctalia keeps state; its config is in the store):
+    #
+    #   shell-state.json - noctalia shows a telemetry question and then the
+    #     changelog when this file has no "last seen version". Filling it in
+    #     on first start skips both. After that, showChangelogOnStartup =
+    #     false in settings.json keeps the changelog away after updates.
+    #     (The first-run setup wizard never shows: it only opens when
+    #     settings.json is missing, and ours is in the store.)
+    #
+    #   wallpapers.json - noctalia's remembered wallpaper. Overwritten on
+    #     every start with a random image from /etc/wallpapers.
+    #
+    # The same `noctalia-shell` command is used for keybinds
+    # (`noctalia-shell ipc call ...`); those have arguments and are skipped.
+    prepareStart = pkgs.writeShellScript "noctalia-prepare-start" ''
+      [ $# -eq 0 ] || exit 0 # an ipc call, not a start
+
+      cache="''${XDG_CACHE_HOME:-$HOME/.cache}/noctalia"
+      mkdir -p "$cache"
+
+      if [ ! -e "$cache/shell-state.json" ]; then
+        echo '{"changelogState": {"lastSeenVersion": "v${pkgs.noctalia-shell.version}"}}' \
+          > "$cache/shell-state.json"
+      fi
+
+      shopt -s nullglob
+      walls=(/etc/wallpapers/*)
+      if [ ''${#walls[@]} -gt 0 ]; then
+        pick=''${walls[RANDOM % ''${#walls[@]}]}
+        echo "{\"defaultWallpaper\": \"$pick\"}" > "$cache/wallpapers.json"
+      fi
+    '';
+  in {
     imports = [wlib.wrapperModules.noctalia-shell];
+
+    runShell = [''${prepareStart} "$@"''];
 
     settings = lib.importJSON ./settings.json;
 

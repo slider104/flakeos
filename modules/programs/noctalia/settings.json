@@ -6,7 +6,9 @@
     "backgroundOpacity": 1
   },
   "general": {
-    "lockOnSuspend": true
+    "lockOnSuspend": true,
+    "showChangelogOnStartup": false,
+    "telemetryEnabled": false
   },
   "ui": {
     "fontDefault": "Noto Sans",

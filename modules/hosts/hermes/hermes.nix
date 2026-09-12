@@ -11,7 +11,7 @@
 
       base
       desktop
-      gaming
+      # gaming
 
       slider
 
