@@ -26,8 +26,28 @@ bindkey '^[[1;5C' forward-word     # Ctrl+Right
 bindkey '^[[1;5D' backward-word    # Ctrl+Left
 
 # --- Prompt ---------------------------------------------------------------------
-# user in ~/dir $     (colours = terminal colours = the palette)
-PROMPT='%F{green}%n%f in %F{blue}%~%f %# '
+# Two lines: a blue pill (user@host) joined to a grey one (directory), then
+# the input arrow, green after success, red when the last command failed:
+#
+#    slider@zeus    ~/flakeos
+#   ❯
+#
+# The round ends and icons are Nerd Font glyphs (the terminal font, see the
+# palette), written as \u codes. Colours are terminal colour numbers, so
+# they follow the palette: blue = 4, grey = 8 (bright black), white = 15.
+# Deep directories are shortened to their last 3 parts: …/a/b/c.
+# The TTY (Ctrl+Alt+F2, for rescues) has no Nerd Font, so it gets a plain
+# version: user@host ~/dir, then > in green/red.
+() {
+  if [[ $TERM == linux ]]; then
+    PROMPT='%F{4}%n@%m%f %~'$'\n''%(?.%F{2}.%F{1})>%f '
+    return
+  fi
+  local round_l=$'' round_r=$'' join=$''
+  local icon_user=$'' icon_dir=$''
+  local dir='%(4~|…/%3~|%~)'
+  PROMPT="%F{4}${round_l}%K{4}%F{15} ${icon_user} %n@%m %F{4}%K{8}${join}%F{15} ${icon_dir} ${dir} %k%F{8}${round_r}%f"$'\n'"%(?.%F{2}.%F{1})❯%f "
+}
 
 # --- Aliases --------------------------------------------------------------------
 alias ls='ls --color=auto'
