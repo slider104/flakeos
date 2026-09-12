@@ -144,7 +144,7 @@ and hosts. Its README says which one to pick and the five steps to use it.
 
 1. Boot the NixOS ISO, connect to the network, and get the repo:
    ```sh
-   git clone <your-repo-url> /tmp/flakeos && cd /tmp/flakeos
+   git clone https://github.com/slider104/flakeos.git /tmp/flakeos && cd /tmp/flakeos
    ```
 2. Check the disk. `ls -l /dev/disk/by-id/ | grep -v part` must list the
    device in `modules/hosts/<host>/disko.nix` (for hermes: fill it in now).
