@@ -4,7 +4,8 @@
     "position": "top",
     "density": "default",
     "useSeparateOpacity": true,
-    "backgroundOpacity": 0
+    "backgroundOpacity": 0,
+    "capsuleOpacity": 0.5
   },
   "general": {
     "animationSpeed": 2,
