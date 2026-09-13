@@ -50,6 +50,17 @@
             Value = 0; # 0 = dark
             Status = "default";
           };
+          # Never translate pages on its own: German sites stay German, English
+          # stay English. Translating by hand (icon in the address bar) still
+          # works. Locked, so an old "always translate" choice can't win.
+          "browser.translations.automaticallyPopup" = {
+            Value = false;
+            Status = "locked";
+          };
+          "browser.translations.alwaysTranslateLanguages" = {
+            Value = "";
+            Status = "locked";
+          };
         };
       };
     };
