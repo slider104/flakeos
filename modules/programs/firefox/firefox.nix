@@ -21,6 +21,9 @@
         DontCheckDefaultBrowser = true;
         OfferToSaveLogins = false;
 
+        # Start with the windows and tabs from last time.
+        Homepage.StartPage = "previous-session";
+
         # Extensions, installed and kept up to date automatically. The key is
         # the extension's ID; the URL's slug is its addons.mozilla.org name.
         ExtensionSettings = {
