@@ -21,9 +21,12 @@ How to read the guides below:
 - The guides use real names (`pinta`, `cava`, `bob`, …). For your own
   thing, replace that name **everywhere** in the commands.
 - Files are edited in Zed. `zeditor <file>` opens one.
+- New to the terminal? Read [Commands used in these guides](#commands-used-in-these-guides)
+  first.
 
 ## Contents
 
+- [Commands used in these guides](#commands-used-in-these-guides)
 - [How a module becomes part of the system](#how-a-module-becomes-part-of-the-system)
 - [Which blueprint do I need?](#which-blueprint-do-i-need)
 - [Where to list it: a bundle or a host?](#where-to-list-it-a-bundle-or-a-host)
@@ -41,6 +44,76 @@ How to read the guides below:
 - [Add a host (a machine)](#add-a-host-a-machine)
 - [Remove something](#remove-something)
 - [When the rebuild complains](#when-the-rebuild-complains)
+
+## Commands used in these guides
+
+Good to know first:
+- `~` is your home folder: `~/flakeos` = `/home/<you>/flakeos`.
+- Paths without a `/` at the start are *relative*: `modules/grouped` means
+  "the folder `modules/grouped` inside the folder I'm in right now". That's
+  why every guide starts with `cd ~/flakeos`.
+- Names are case sensitive: `Pinta` and `pinta` are two different things.
+- **Tab** completes file and folder names, so you rarely type them fully.
+
+| command | does | example |
+|---|---|---|
+| `cd <folder>` | go into a folder | `cd ~/flakeos` |
+| `cp <from> <to>` | copy a file | `cp blueprints/system/example.nix modules/system/printing.nix` |
+| `cp -r <from> <to>` | copy a folder with everything inside (`-r` = recursive; without it, `cp` refuses folders) | `cp -r blueprints/programs/plain modules/programs/pinta` |
+| `mv <old> <new>` | rename a file (or move it somewhere else) | `mv …/example.nix …/pinta.nix` |
+| `rm <file>` | delete a file. There is no trash: it's gone | `rm modules/programs/cava/example.conf` |
+| `rm -r <folder>` | delete a folder with everything inside | `rm -r modules/programs/pinta` |
+| `sed …` | find and replace text in a file, see [below](#sed-find-and-replace-in-a-file) | `sed -i 's/example/pinta/g' pinta.nix` |
+| `zeditor <file>` | open a file in Zed | `zeditor modules/grouped/desktop.nix` |
+| `grep -rnw <word> <folder>` | find a word in all files: `-r` also in subfolders, `-n` show line numbers, `-w` whole word only (`pinta`, but not `pintatools`) | `grep -rnw pinta modules` |
+| `git add -A` | tell git about all changes: new, changed and deleted files | |
+| `nrs` | rebuild the system and switch to it (an alias, see the [main README](../README.md)) | |
+| `nix search nixpkgs <word>` | search for a package | `nix search nixpkgs pinta` |
+| `nix run nixpkgs#<name>` | start a program without installing it | `nix run nixpkgs#pinta` |
+| `nix run .#<name>` | start one of *this flake's* wrapped programs without rebuilding | `nix run .#cava` |
+
+### sed: find and replace in a file
+
+`sed` (stream editor) replaces text in a file without opening it. The
+guides use it to rename, because every blueprint says `example` wherever
+the real name has to go:
+
+```sh
+sed -i 's/example/pinta/g' modules/programs/pinta/pinta.nix
+```
+
+| part | means |
+|---|---|
+| `sed` | the program |
+| `-i` | "in place": change the file itself. Without `-i`, sed only prints the changed text and the file stays as it was |
+| `'s/example/pinta/g'` | the instruction: **s**ubstitute `/` find this `/` put this instead `/` **g**lobal |
+| `s` | substitute (replace) |
+| `example` | the text to find |
+| `pinta` | the text to put in its place |
+| `g` | every match in a line, not only the first one |
+| `'…'` | the quotes keep the instruction together as one piece |
+| `modules/programs/pinta/pinta.nix` | the file to change |
+
+In the file, every `example` becomes `pinta`:
+
+```nix
+flake.nixosModules.example = {pkgs, lib, ...}: {    # before
+flake.nixosModules.pinta = {pkgs, lib, ...}: {      # after
+```
+
+> **Watch the quotes:** single quotes `'…'` pass the text exactly as
+> written, double quotes `"…"` fill in `$VARIABLES` first. The guides here
+> use single quotes (no variables); the install guide uses double quotes
+> where `$HOST` or `$NAME` has to become your name. Mix them up, and sed
+> writes the literal letters `$HOST` into your file.
+
+Why not by hand? A blueprint has the placeholder in several places
+(`flake.nixosModules.example`, `pkgs.example`, …). Miss one, and the name
+the file publishes doesn't match the name you list, and the rebuild fails.
+`sed` gets them all at once.
+
+Prefer to see it happen? Open the file in Zed, press **Ctrl+H** (find and
+replace), type `example` and `pinta`, click "Replace All". Same result.
 
 ## How a module becomes part of the system
 

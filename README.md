@@ -29,17 +29,17 @@ niri + noctalia, one Adwaita-dark look everywhere, ready for gaming. No home-man
 ## Layout
 
 ```
-wallpapers/    your wallpapers, installed to /etc/wallpapers (pick one with Mod+W)
-blueprints/    templates to copy into modules/ (not used by the system itself)
+wallpapers/               your wallpapers, installed to /etc/wallpapers (pick one with Mod+W)
+blueprints/               templates to copy into modules/ (not used by the system itself)
 modules/
-├── setup/     how the flake is wired + the disk layout (not day-to-day)
+├── setup/                how the flake is wired + the disk layout (not day-to-day)
 │   ├── parts.nix         flake-parts, wrapper library, `nix fmt`
 │   ├── disko.nix         ESP + ext4 root, shared by all hosts
 │   └── README.md         the installation guide
-├── system/    OS settings, one topic per file
+├── system/               OS settings, one topic per file
 │   ├── boot  nix  network  locale  audio  bluetooth  fonts  login  polkit  xdg
 │   └── theme/            palette.nix (THE colours) + theme.nix (GTK/Qt/cursor/TTY)
-├── programs/  one folder per program: <name>.nix + its native config file(s)
+├── programs/             one folder per program: <name>.nix + its native config file(s)
 │   ├── niri/             niri.nix + config.kdl
 │   ├── noctalia/         noctalia.nix + settings.json
 │   ├── alacritty/        alacritty.nix + alacritty.toml
@@ -49,7 +49,7 @@ modules/
 │   ├── firefox/ thunar/ steam/ gamemode/ gamescope/ prismlauncher/ lutris/ openrgb/
 │   ├── shortwave/ rnote/ libreoffice/ rustdesk/ mediawriter/ claude-code/ fresh/
 │   └── nix-tools/ (nixd, nil, alejandra)   cli/ (small tools, no config)
-├── grouped/   bundles a host picks from
+├── grouped/              bundles a host picks from
 │   ├── base.nix          every machine: boot, nix, network, locale, zsh, git, btop, bat, cli
 │   ├── desktop.nix       login, polkit, audio, theme, niri, noctalia, alacritty, firefox, zed, apps, ...
 │   └── gaming.nix        steam, gamemode, gamescope, mangohud, prismlauncher, lutris
@@ -77,7 +77,7 @@ modules = with self.nixosModules; [
 |---|---|
 | use the system every day: keys, commands, where to change what | this file, below |
 | add a program, a system setting, a bundle, a user or a machine | [`blueprints/README.md`](blueprints/README.md) |
-| install flakeos on a PC (or reinstall zeus / hermes) | [`modules/setup/README.md`](modules/setup/README.md) |
+| install flakeos on a PC, or reinstall a configured host like zeus | [`modules/setup/README.md`](modules/setup/README.md) |
 
 ---
 

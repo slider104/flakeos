@@ -10,11 +10,14 @@ need to know NixOS for it.
 - **The disk you pick in step 4 gets erased completely.** Other disks are
   not touched.
 
-Reinstalling zeus or hermes? Read
-[Reinstalling zeus or hermes](#optional-reinstalling-zeus-or-hermes) first.
+Reinstalling a machine that's already in the repo (like zeus)? Use the
+short version: [Reinstalling a configured host](#reinstalling-a-configured-host-example-zeus).
+New to the terminal? Read [Commands used in this guide](#commands-used-in-this-guide)
+first.
 
 ## Contents
 
+- [Commands used in this guide](#commands-used-in-this-guide)
 1. [Boot the installer](#1-boot-the-installer)
 2. [Get flakeos](#2-get-flakeos) (+ optional: [local only, without git](#optional-local-only-without-git))
 3. [Pick your names](#3-pick-your-names)
@@ -26,7 +29,7 @@ Reinstalling zeus or hermes? Read
 9. [First start](#9-first-start)
 10. [Make it yours](#10-make-it-yours)
 - Optional: [Your own GitHub repo](#optional-your-own-github-repo)
-- Optional: [Reinstalling zeus or hermes](#optional-reinstalling-zeus-or-hermes)
+- [Reinstalling a configured host (example: zeus)](#reinstalling-a-configured-host-example-zeus)
 - [When something goes wrong](#when-something-goes-wrong)
 
 ## What you need
@@ -58,6 +61,74 @@ After that, three tools do the work:
    reboot you keep working on the same files in `~/flakeos`.
 
 Nothing on the disk changes before step 7.
+
+## Commands used in this guide
+
+Good to know first:
+- Names are case sensitive: `Mybox` and `mybox` are two different things.
+- **Tab** completes file and folder names, so you rarely type them fully.
+  The Up arrow brings back the last command.
+- Paths without a `/` at the start are *relative*: `modules/hosts` means
+  "the folder `modules/hosts` inside the folder I'm in right now". That's
+  why step 2 ends with `cd /tmp/flakeos`.
+- `~` is the home folder of whoever you are right now.
+
+| command | does | example |
+|---|---|---|
+| `sudo -i` | become root (the administrator) until you close the console. The prompt then ends with `#` | |
+| `cd <folder>` | go into a folder | `cd /tmp/flakeos` |
+| `cp -r <from> <to>` | copy a folder with everything inside (`-r` = recursive) | `cp -r blueprints/hosts/example modules/hosts/$HOST` |
+| `mv <old> <new>` | rename a file (or move it) | `mv …/example.nix …/$HOST.nix` |
+| `mkdir -p <folder>` | create a folder (`-p`: also the folders above it, and no error if it exists) | `mkdir -p /mnt/home/$NAME` |
+| `cat <file>` | show a file's content | `cat modules/users/$NAME.nix` |
+| `ls -l <path>` | list files with details. For a link, the arrow `->` shows where it points | `ls -l $DISK` |
+| `lsblk` | list disks and partitions | `lsblk -d -o NAME,SIZE,MODEL` |
+| `grep <text> <file>` | show only the lines that contain the text | `grep device modules/hosts/$HOST/disko.nix` |
+| `nano <file>` | a simple text editor. Ctrl+O saves, Ctrl+X quits | |
+| `sed …` | find and replace text in a file, see [below](#sed-find-and-replace-in-a-file) | |
+| `chown -R <user>:<group> <folder>` | make a user the owner of a folder and everything inside | `chown -R $NAME:users /home/$NAME` |
+| `reboot` | restart the PC | |
+
+Shell features the commands use:
+
+| written | means | example |
+|---|---|---|
+| `HOST=mybox` | store the text `mybox` in the variable `HOST`. No spaces around `=` | `HOST=mybox` |
+| `$HOST` | put the stored text in here. The console turns `modules/hosts/$HOST` into `modules/hosts/mybox` before running the command | `cd modules/hosts/$HOST` |
+| `echo <text>` | print text, e.g. to check a variable | `echo $HOST $NAME` |
+| `a \| b` | a *pipe*: the output of `a` goes into `b` instead of onto the screen | `ls -l /dev/disk/by-id/ \| grep -v part` (`-v`: only lines *without* "part") |
+| `a > file` | write the output of `a` into a file. **Replaces** what was in it | `sed "…" slider.nix > $NAME.nix` |
+| `{ a; b; c; } > file` | run several commands and write all their output into one file | the hardware scan in step 4 |
+| `*.nix` | all files ending in `.nix` in that folder | `modules/hosts/$HOST/*.nix` |
+| `'…'` | text in single quotes is taken exactly as written | `'s/"de"/"us"/'` |
+| `"…"` | text in double quotes, but `$VARIABLES` inside are filled in | `"s/example/$HOST/g"` |
+
+### sed: find and replace in a file
+
+`sed` (stream editor) replaces text in a file without opening it. The
+blueprints say `example` or `slider` wherever your names have to go, and
+`sed` fixes every place at once, so none can be missed. The basic form:
+
+```sh
+sed -i 's/example/mybox/g' file.nix
+```
+
+| part | means |
+|---|---|
+| `-i` | "in place": change the file itself. Without `-i`, sed prints the changed text instead |
+| `s` | substitute (replace) |
+| `/example/` | the text to find |
+| `mybox/` | the text to put in its place |
+| `g` | every match in a line, not only the first one |
+
+The four forms in this guide:
+
+| command (shortened) | what's different |
+|---|---|
+| `sed -i "s/example/$HOST/g" modules/hosts/$HOST/*.nix` | **double quotes**, so `$HOST` becomes your hostname. In single quotes, sed would write the letters `$HOST` into the file. `*.nix` does all three files at once |
+| `sed -i "s\|/dev/disk/by-id/CHANGE-ME\|$DISK\|" …/disko.nix` | **`\|` instead of `/`** between the parts: the text itself is full of `/`, which would confuse sed. Any sign works as long as it's the same three times |
+| `sed "s/slider/$NAME/g" modules/users/slider.nix > modules/users/$NAME.nix` | **no `-i`**: `slider.nix` stays as it is, and `>` writes the changed copy into a new file |
+| `sed -i '/^ *gaming$/d' …/$HOST.nix` | **`d` = delete** every line that matches. `^` = line start, ` *` = any number of spaces, `$` = line end. So: a line that is only `gaming` (with its indent) |
 
 ---
 
@@ -508,62 +579,90 @@ From now on: "Saving changes to GitHub" in the
 Never share `~/.ssh/id_ed25519` (the one without `.pub`), and never put it
 into the repo. If it's public, anyone can push as you.
 
-## Optional: reinstalling zeus or hermes
+## Reinstalling a configured host (example: zeus)
 
-For slider's own machines. Host and user already exist in the repo, so the
-steps get shorter.
+The short version, for a machine whose host (`hardware.nix`, `disko.nix`)
+and user are already in the repo on GitHub. Nothing to create, so steps 3
+to 6 fall away. For another configured host, replace `zeus` (and `slider`,
+if it's another user).
 
-### Before: back up (zeus)
+1. **Back up, on the old system.** The install erases the 1 TB system drive,
+   where `/home/slider` lives. The 2 TB data drive (`/mnt/data`) is never
+   touched. Push your latest changes to GitHub, then copy the SSH key to
+   the data drive:
+   ```sh
+   cp -r ~/.ssh /mnt/data/ssh-backup
+   ```
 
-The install erases the 1 TB system drive, and that's where `/home/slider`
-lives. The 2 TB data drive (`/mnt/data`) is never touched.
+2. **Boot the installer** (see [step 1](#1-boot-the-installer)), become root:
+   ```sh
+   sudo -i
+   ```
+   German keyboard:
+   ```sh
+   loadkeys de
+   ```
+   Wi-Fi only (cable works by itself):
+   ```sh
+   nmtui
+   ```
 
-- Push the latest changes to GitHub (main README, "Saving changes to GitHub").
-- Copy your SSH key to the data drive:
-  ```sh
-  cp -r ~/.ssh /mnt/data/ssh-backup
-  ```
+3. **Get the repo:**
+   ```sh
+   git clone https://github.com/slider104/flakeos.git /tmp/flakeos
+   ```
+   ```sh
+   cd /tmp/flakeos
+   ```
 
-### Install
+4. **Check the disk.** The disk in `disko.nix` must show up in the list:
+   ```sh
+   grep device modules/hosts/zeus/disko.nix
+   ```
+   ```sh
+   ls -l /dev/disk/by-id/ | grep -v part
+   ```
 
-- Do [step 1](#1-boot-the-installer) and [step 2](#2-get-flakeos).
-- The machine:
-  ```sh
-  HOST=zeus
-  ```
-  (or `HOST=hermes`)
-- The user:
-  ```sh
-  NAME=slider
-  ```
-- **zeus:** skip steps 4 and 5, everything is in the repo already.
-- **hermes, the first time:** from step 4, do only
-  [The hardware scan](#the-hardware-scan) and [Which disk](#which-disk).
-  The commands work as written because `$HOST` is `hermes`. Don't copy the
-  blueprint, the folder exists. Skip step 5.
-- Then [step 6](#6-check-the-config), [7](#7-format-the-disk),
-  [8](#8-install) and [9](#9-first-start). The first password is `slider`.
+5. **Format** (**erases that disk**; type `yes` when asked):
+   ```sh
+   nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode destroy,format,mount --flake .#zeus
+   ```
 
-### After the first start
+6. **Install, then restart** (pull out the USB stick):
+   ```sh
+   nixos-install --flake .#zeus --no-root-passwd
+   ```
+   ```sh
+   reboot
+   ```
 
-- Put the SSH key back:
-  ```sh
-  cp -r /mnt/data/ssh-backup ~/.ssh
-  ```
-- Only you may read the folder:
-  ```sh
-  chmod 700 ~/.ssh
-  ```
-- Only you may read the private key (ssh refuses it otherwise):
-  ```sh
-  chmod 600 ~/.ssh/id_ed25519
-  ```
-- Check. It should answer "Hi slider104!":
-  ```sh
-  ssh -T git@github.com
-  ```
-- hermes: commit and push the new `hardware.nix` and `disko.nix`, so
-  they're on GitHub for the next time.
+7. **First start.** You're logged into niri automatically. Open a terminal
+   (Mod+Return), change the password (the first one is `slider`):
+   ```sh
+   passwd
+   ```
+   Get the repo into your home:
+   ```sh
+   git clone https://github.com/slider104/flakeos.git ~/flakeos
+   ```
+
+8. **Put the SSH key back**, readable only for you (ssh refuses it
+   otherwise):
+   ```sh
+   cp -r /mnt/data/ssh-backup ~/.ssh
+   ```
+   ```sh
+   chmod 700 ~/.ssh
+   ```
+   ```sh
+   chmod 600 ~/.ssh/id_ed25519
+   ```
+   Check, it should answer "Hi slider104!":
+   ```sh
+   ssh -T git@github.com
+   ```
+
+Then press Mod+W for a wallpaper. Done.
 
 ---
 
