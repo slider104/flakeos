@@ -1,8 +1,8 @@
 {
   # BLUEPRINT: a person with a login.
-  # Copy to modules/users/<name>.nix and replace every `example`.
-  # Then add `example` to the modules list of each host they should exist on.
-  # Real example in this repo: users/slider.nix.
+  # How to use it: blueprints/README.md
+  # A host gets this user by listing `example` in its modules.
+  # Real one in this repo: users/slider.nix.
   flake.nixosModules.example = {config, ...}: {
     users.users.example = {
       isNormalUser = true;

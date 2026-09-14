@@ -1,8 +1,8 @@
 {
   # BLUEPRINT: a program that is NOT wrapped. For programs that keep their own
   # settings (Steam, launchers, GUI apps with a settings dialog) or need nothing.
-  # Copy this folder to modules/programs/<name>/ and replace every `example`.
-  # Real examples in this repo: programs/steam/, programs/lutris/.
+  # How to use it: blueprints/README.md
+  # Real ones in this repo: programs/steam/, programs/lutris/.
   flake.nixosModules.example = {
     pkgs,
     lib,

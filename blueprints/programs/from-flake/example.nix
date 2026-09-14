@@ -1,6 +1,6 @@
 {inputs, ...}: {
   # BLUEPRINT: a program that is NOT in nixpkgs but ships its own flake.
-  # Copy this folder to modules/programs/<name>/ and replace every `example`.
+  # How to use it: blueprints/README.md
   # Always check nixpkgs first (https://search.nixos.org/packages): one less
   # input to keep updated.
   #

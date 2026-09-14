@@ -6,7 +6,7 @@
   #
   # Copy everything between the outer `{ ... }` of its output into the block
   # below. Keep --no-filesystems: disko.nix owns the filesystems.
-  # Real example in this repo: hosts/zeus/hardware.nix.
+  # Real one in this repo: hosts/zeus/hardware.nix.
   flake.nixosModules.example-hardware = {
     config,
     lib,

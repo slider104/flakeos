@@ -1,6 +1,6 @@
 {self, ...}: {
   # BLUEPRINT: which disk the installer formats (layout: modules/setup/disko.nix,
-  # ESP + ext4 root). Real example in this repo: hosts/zeus/disko.nix.
+  # ESP + ext4 root). Real one in this repo: hosts/zeus/disko.nix.
   #
   # On the machine, list the disks by their permanent names:
   #   ls -l /dev/disk/by-id/ | grep -v part

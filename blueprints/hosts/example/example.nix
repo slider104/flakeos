@@ -4,9 +4,8 @@
   ...
 }: {
   # BLUEPRINT: a machine.
-  # Copy this folder to modules/hosts/<name>/, rename example.nix to <name>.nix,
-  # and replace every `example` in all three files with the machine's name.
-  # Real examples in this repo: hosts/zeus/, hosts/hermes/.
+  # How to use it: blueprints/README.md
+  # Real ones in this repo: hosts/zeus/, hosts/hermes/.
   #
   # Build or switch with:  sudo nixos-rebuild switch --flake .#example
   # (or just `nrs` on the machine itself; it's picked by hostname).

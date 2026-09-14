@@ -2,8 +2,8 @@
   wrappers = config.flake.wrappers;
 in {
   # BLUEPRINT: a program wrapped by hand, for when there is NO ready-made module.
-  # Copy this folder to modules/programs/<name>/ and replace every `example`.
-  # Real example in this repo: programs/mangohud/.
+  # How to use it: blueprints/README.md
+  # Real one in this repo: programs/mangohud/.
   #
   # First find out how the program can be told where its config is.
   # Look in `man example` or `example --help` for either:
