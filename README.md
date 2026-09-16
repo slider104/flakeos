@@ -29,6 +29,7 @@ niri + noctalia, one Adwaita-dark look everywhere, ready for gaming. No home-man
 ## Layout
 
 ```
+assets/                   just assets like logos for the system (not wallpapers)
 wallpapers/               your wallpapers, installed to /etc/wallpapers (pick one with Mod+W)
 blueprints/               templates to copy into modules/ (not used by the system itself)
 modules/
