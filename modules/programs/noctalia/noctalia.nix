@@ -63,6 +63,26 @@ in {
 
     runShell = [''${prepareStart} "$@"''];
 
+    # System monitor panel (click the bar's system monitor): the numbers above
+    # the graphs (CPU %, temperature, memory, network speed) are drawn in the
+    # accent blues, hard to read on the dark card. No setting for it, so patch
+    # them to the normal text colour. Icons and graph lines keep their colours.
+    # --replace-fail: if an update changes that file, the build stops here
+    # instead of silently dropping the fix.
+    package = pkgs.noctalia-shell.overrideAttrs (old: {
+      postPatch =
+        (old.postPatch or "")
+        + ''
+          substituteInPlace Modules/Panels/SystemStats/SystemStatsPanel.qml \
+            --replace-fail \
+              $'color: Color.mPrimary\n              font.family: Settings.data.ui.fontFixed' \
+              $'color: Color.mOnSurface\n              font.family: Settings.data.ui.fontFixed' \
+            --replace-fail \
+              $'color: Color.mSecondary\n              font.family: Settings.data.ui.fontFixed' \
+              $'color: Color.mOnSurface\n              font.family: Settings.data.ui.fontFixed'
+        '';
+    });
+
     settings = lib.importJSON ./settings.json;
 
     # Noctalia's colour roles, filled from the palette.
