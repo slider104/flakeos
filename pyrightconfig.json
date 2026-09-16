@@ -1,0 +1,16 @@
+// Settings for Zed's Python checker (basedpyright). Only matters while
+// editing modules/programs/ydotool/autoclicker.py, the one Python file here.
+{
+  // How strict. Zed normally uses "standard", but with this file present
+  // basedpyright ignores Zed's settings and would use its much stricter default.
+  "typeCheckingMode": "standard",
+
+  // The app's python with its libraries (gi, evdev) and their type
+  // descriptions: /etc/autoclicker/python, made by programs/ydotool/ydotool.nix.
+  "venvPath": "/etc/autoclicker",
+  "venv": "python",
+
+  // gi.repository (Gtk, Adw, GLib) is generated when the app starts, so
+  // there is no source file to find, only the type descriptions. Don't warn.
+  "reportMissingModuleSource": false
+}

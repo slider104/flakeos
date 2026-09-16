@@ -27,6 +27,7 @@
       libreoffice
       rustdesk
       mediawriter
+      ydotool # autoclicker ("Autoclicker" in the launcher)
     ];
   };
 }

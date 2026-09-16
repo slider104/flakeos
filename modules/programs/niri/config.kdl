@@ -107,6 +107,12 @@ window-rule {
     default-column-width { proportion 0.1; }
 }
 
+// Autoclicker window (programs/ydotool): floating instead of a column.
+window-rule {
+    match app-id=r#"^org\.flakeos\.Autoclicker$"#
+    open-floating true
+}
+
 // ----------------------------------------------------------------------------
 // Key binds
 // ----------------------------------------------------------------------------

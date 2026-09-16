@@ -193,6 +193,7 @@ menu, so a broken change is never a disaster (see
 | which programs a machine gets | `grouped/*.nix` and `hosts/<host>/<host>.nix` |
 | which app opens which file type | the program's own `.nix` file, see [Default apps](#default-apps) |
 | automatic cleanup, unfree software | `system/nix.nix` |
+| autoclicker | the Autoclicker window (saves by itself); how it works: `programs/ydotool/ydotool.nix` |
 | RGB colours (zeus) | `programs/openrgb/openrgb.nix` |
 | the data drive (zeus) | `hosts/zeus/zeus.nix` |
 

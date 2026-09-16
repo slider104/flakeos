@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Autoclicker
+Comment=Click the mouse automatically
+Exec=autoclicker
+Icon=kmousetool
+Categories=Utility;
+Keywords=click;mouse;auto;
+StartupNotify=true
