@@ -20,7 +20,12 @@
     boot.plymouth = {
       enable = true;
       theme = "spinner";
-      logo = "${pkgs.nixos-icons}/share/icons/hicolor/512x512/apps/nix-snowflake.png";
+      # wallpapers/nix00.png is a 1183x1024 RGBA snowflake; scaled down to
+      # 512 tall it stays sharper than the 512 icon from nixos-icons. Nix
+      # only sees git-tracked files, so keep this one committed.
+      logo = pkgs.runCommand "nixos-logo-512.png" {nativeBuildInputs = [pkgs.imagemagick];} ''
+        magick ${../../wallpapers/nix00.png} -resize x512 $out
+      '';
     };
 
     # Plymouth only covers the console if the console stays quiet: "quiet"
