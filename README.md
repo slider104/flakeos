@@ -384,6 +384,56 @@ Zed just works. `ssh -T git@github.com` checks the key: it should answer
 "Hi slider104!". No key yet, or your own GitHub repo? See
 [the install guide](modules/setup/README.md#optional-your-own-github-repo).
 
+## Two machines
+
+**How it works:** GitHub is the meeting point. Each machine has its own copy
+of the repo, and they only line up once one machine pushes and the other
+pulls. `programs/git/gitconfig` sets `pull.rebase = true`: when both machines
+made commits, a pull puts your local commits on top of the ones from GitHub,
+so the history stays a straight line.
+
+- Before editing on a machine, get the latest state first. This avoids most
+  trouble:
+  ```sh
+  git pull
+  ```
+- Changed something on machine A: commit and push there, then on machine B:
+  ```sh
+  git pull
+  nrs
+  ```
+- B has uncommitted changes, so the pull refuses ("cannot pull with rebase:
+  You have unstaged changes"). Commit them first, or park them during the
+  pull:
+  ```sh
+  git pull --autostash
+  ```
+- Both machines made commits: `git pull` on B stacks B's commits on top,
+  then `git push` from B and `git pull` on A.
+- Both changed the same lines: the pull stops with a conflict. Fix the file
+  (git marks the spot with `<<<<<<<` and `>>>>>>>`), then:
+  ```sh
+  git add <file>
+  git rebase --continue
+  ```
+  Or give up and go back to how it was before the pull:
+  ```sh
+  git rebase --abort
+  ```
+- Updates: run `nup` on **one** machine only, commit and push `flake.lock`.
+  The other machine pulls and runs `nrs`, and gets exactly the same versions.
+  Ran `nup` on both and now `flake.lock` conflicts? Keep the one from GitHub
+  (in a rebase, `--ours` is the GitHub side), then `nrs` so this machine
+  builds those versions instead of its own discarded update:
+  ```sh
+  git checkout --ours flake.lock
+  git add flake.lock
+  git rebase --continue
+  nrs
+  ```
+  `flake.lock` is a normal file in git: after a pull, both machines have the
+  same one. They only drift apart if one runs `nup` and doesn't push.
+
 ## Something broke?
 
 - **The rebuild failed:** nothing changed, you're still on the old system.
