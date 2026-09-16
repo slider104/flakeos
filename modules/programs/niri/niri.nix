@@ -38,7 +38,18 @@ in {
     '';
   in {
     imports = [wlib.wrapperModules.niri];
-    "config.kdl".path = "${configDir}/config.kdl";
+
+    # The wrapper generates its own config file (niri-config.kdl inside the
+    # package). niri starts with it, `niri validate` checks it at build time,
+    # and after every rebuild the running niri reloads it (niri.service
+    # ExecReload). So that file must be OUR config: it just includes it.
+    #
+    # Don't use `"config.kdl".path` instead: niri would start with our file,
+    # but the reload after a rebuild would still load the wrapper's own,
+    # EMPTY file (all key binds gone, default looks until the next login).
+    "config.kdl".content = ''
+      include "${configDir}/config.kdl"
+    '';
   };
 
   flake.nixosModules.niri = {
