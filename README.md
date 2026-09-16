@@ -262,8 +262,10 @@ xdg-mime query default image/png
 
 ## Wallpapers
 
-Every login starts with a random picture from `wallpapers/` (repo root).
-Mod+W picks another one until the next login.
+Mod+W picks a picture from `wallpapers/` (repo root); it stays across
+logins. Want a random one on every login instead? That's already there,
+just commented out: uncomment the block in `prepareStart` in
+`programs/noctalia/noctalia.nix` and rebuild.
 
 - Put the picture into `~/flakeos/wallpapers/`, then:
   ```sh

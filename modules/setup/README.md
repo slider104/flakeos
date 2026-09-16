@@ -474,7 +474,7 @@ get a small text login screen instead.
   ```sh
   passwd
   ```
-- Pick a wallpaper: **Mod+W**. Every login starts with a random one.
+- Pick a wallpaper: **Mod+W**. It stays across logins.
 - All key binds: **Mod+BackSpace**. The most important ones, the commands
   and "where do I change what" are in the [main README](../../README.md).
 

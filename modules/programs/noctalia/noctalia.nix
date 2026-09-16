@@ -16,9 +16,9 @@ in {
   # Only settings you set are here; everything else uses noctalia's defaults.
   #
   # Wallpapers: the images in flakeos/wallpapers/ (repo root) are installed to
-  # /etc/wallpapers. Every login starts with a random one (see prepareStart);
-  # Mod+W picks another until the next login. To add one, drop the file in,
-  # `git add` it, rebuild.
+  # /etc/wallpapers. Mod+W picks one; it stays across logins. A random one on
+  # every login is possible too (commented out in prepareStart). To add one,
+  # drop the file in, `git add` it, rebuild.
   flake.wrappers.noctalia-shell = {
     wlib,
     lib,
@@ -35,8 +35,9 @@ in {
     #     (The first-run setup wizard never shows: it only opens when
     #     settings.json is missing, and ours is in the store.)
     #
-    #   wallpapers.json - noctalia's remembered wallpaper. Overwritten on
-    #     every start with a random image from /etc/wallpapers.
+    #   wallpapers.json - noctalia's remembered wallpaper. Can be overwritten
+    #     on every start with a random image from /etc/wallpapers (commented
+    #     out below).
     #
     # The same `noctalia-shell` command is used for keybinds
     # (`noctalia-shell ipc call ...`); those have arguments and are skipped.
@@ -51,12 +52,14 @@ in {
           > "$cache/shell-state.json"
       fi
 
-      shopt -s nullglob
-      walls=(/etc/wallpapers/*)
-      if [ ''${#walls[@]} -gt 0 ]; then
-        pick=''${walls[RANDOM % ''${#walls[@]}]}
-        echo "{\"defaultWallpaper\": \"$pick\"}" > "$cache/wallpapers.json"
-      fi
+      # Random wallpaper on every login.
+      # Uncomment to turn it back on.
+      # shopt -s nullglob
+      # walls=(/etc/wallpapers/*)
+      # if [ ''${#walls[@]} -gt 0 ]; then
+      #   pick=''${walls[RANDOM % ''${#walls[@]}]}
+      #   echo "{\"defaultWallpaper\": \"$pick\"}" > "$cache/wallpapers.json"
+      # fi
     '';
   in {
     imports = [wlib.wrapperModules.noctalia-shell];
