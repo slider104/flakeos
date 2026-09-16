@@ -7,7 +7,7 @@
       nix
       network
       locale
-      keyboard-reboot # USB keyboards that stay dark after a reboot
+      reboot
 
       # programs/
       zsh
