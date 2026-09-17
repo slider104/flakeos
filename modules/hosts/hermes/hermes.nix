@@ -13,6 +13,7 @@
       desktop
       bluetooth
       # gaming
+      rustdesk
 
       slider
 
