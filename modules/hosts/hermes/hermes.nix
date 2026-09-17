@@ -20,6 +20,12 @@
         networking.hostName = "hermes";
         services.greetd.settings.initial_session.user = "slider"; # autologin
 
+        # Bluetooth starts switched off (saves battery). The service still
+        # runs, so the Bluetooth button in the bar turns it on for the
+        # session; after a reboot it is off again. mkForce wins over the
+        # shared `powerOnBoot = true` in system/bluetooth.nix.
+        hardware.bluetooth.powerOnBoot = lib.mkForce false;
+
         # noctalia: the shared bar (programs/noctalia/settings.json) plus
         # Bluetooth and Battery on the right. A list can't be partly
         # overridden, so this is the whole right side; mkForce makes it win
