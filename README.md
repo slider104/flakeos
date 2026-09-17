@@ -369,17 +369,17 @@ before it boots for the first time:
 
 | page | set | why |
 |---|---|---|
-| Memory | `16384` MiB | the guest's RAM. zeus has 64 GB, so 16 for the guest and plenty left for the host |
-| CPUs → vCPU allocation | `16` | zeus has 32 threads; half for the guest, half stays with the host |
-| CPUs → Topology | 1 socket, 8 cores, 2 threads | the guest sees one 8-core CPU with hyperthreading instead of 16 separate sockets — Windows and most schedulers handle that much better |
-| CPUs → Model | `host-passthrough` | already set: the guest sees zeus' real CPU with all its instructions. The biggest single speed setting |
+| Memory | about a quarter of the host's RAM (`16384` MiB on a 64 GB machine) | enough for a full desktop guest, with plenty left for the host |
+| CPUs → vCPU allocation | about half the host's threads (`16` of 32) | the guest gets real cores, the host keeps enough to stay responsive |
+| CPUs → Topology | 1 socket, half the vCPUs as cores, 2 threads (16 vCPUs → 1 × 8 × 2) | the guest sees one normal CPU with hyperthreading instead of a pile of single-core sockets — Windows and most schedulers handle that much better |
+| CPUs → Model | `host-passthrough` | already set: the guest sees this machine's real CPU with all its instructions. The biggest single speed setting |
 | Overview → Firmware | `UEFI` | already set: guests boot like a modern PC. Windows 11 needs it |
 | Overview → Chipset | `Q35` | the modern virtual mainboard (PCIe, UEFI). The wizard picks it for anything recent |
 | Disk 1 → Disk bus | `VirtIO` | the guest talks to the disk directly instead of through an emulated SATA controller — the biggest difference in disk speed |
 | Disk 1 → Advanced → Discard mode | `unmap` | deleting files in the guest gives the space back on the host |
 | NIC → Device model | `virtio` | the same idea for the network card |
-| Display Spice | keep Spice | clipboard, automatic resolution, USB devices |
-| Video | `Virtio`, and tick 3D acceleration for a Linux guest | lets the guest use zeus' GPU for the desktop |
+| Display Spice | keep Spice; *Listen type* **None** and tick **OpenGL**, render node = the GPU your monitors are on | clipboard, automatic resolution, USB devices. OpenGL belongs to the 3D below; the dropdown names every GPU, pick the one drawing your desktop, not the CPU's built-in one |
+| Video | `Virtio`, and tick **3D acceleration** for a Linux guest | lets the guest use the real GPU for its desktop. Linux only: Windows has no driver for it, leave both off there |
 | TPM (Add Hardware → TPM) | emulated TPM 2.0, only for Windows 11 | Windows 11 refuses to install without one |
 
 Then **Begin Installation**. Memory, CPUs and disk can be changed later in the
@@ -421,6 +421,19 @@ it the screen stays at 1024x768 and the clipboard is separate.
 - **Snapshots:** the camera icon in the machine's window. Takes a picture of
   the whole machine you can jump back to (qcow2 disks can do this).
 - **Every knob libvirt has:** the XML tab in the machine's details.
+
+### When a machine will not start
+
+- *"The display backend does not have OpenGL support enabled"* - the **Video**
+  device has *3D acceleration* ticked while the **Display Spice** device has no
+  *OpenGL*. The two belong together. Either tick OpenGL on the Display page (it
+  can only be ticked while *Listen type* is **None**), or untick 3D
+  acceleration on the Video page - a Linux guest runs fine without it, the
+  desktop is then drawn by the CPU.
+- *The Windows installer shows no disk* - it has no VirtIO driver yet, see
+  above.
+- *No network in the guest* - `systemctl status libvirt-default-network` on
+  this machine; that service starts libvirt's NAT switch at every boot.
 
 ## Saving changes to GitHub
 
