@@ -205,6 +205,8 @@ binds {
     Mod+Ctrl+Shift+Up               hotkey-overlay-title="Move column to upper monitor" { move-column-to-monitor-up; }
     Mod+Ctrl+Shift+Right            hotkey-overlay-title="Move column to right monitor" { move-column-to-monitor-right; }
 
+    Mod+Shift+Left                  hotkey-overlay-title="Focus left monitor" { focus-monitor-left; }
+    Mod+Shift+Right                 hotkey-overlay-title="Focus right monitor" { focus-monitor-right; }
     Mod+MouseBack                   hotkey-overlay-title="Focus left monitor" { focus-monitor-left; }
     Mod+MouseForward                hotkey-overlay-title="Focus right monitor" { focus-monitor-right; }
     Mod+Ctrl+Shift+MouseBack        hotkey-overlay-title="Move column to left monitor" { move-column-to-monitor-left; }
