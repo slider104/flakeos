@@ -13,6 +13,7 @@
       desktop
       gaming
       openrgb
+      rustdesk
 
       slider
 
