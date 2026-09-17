@@ -457,10 +457,11 @@ own password. One password less, and no one can log in as root.
   ```sh
   nixos-enter --root /mnt -c "chown -R $NAME:users /home/$NAME"
   ```
-- Pull out the USB stick and restart:
+- Restart the machine:
   ```sh
   reboot
   ```
+- Pull out the USB stick when the machine is booting.
 
 ## 9. First start
 
