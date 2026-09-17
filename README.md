@@ -38,7 +38,7 @@ modules/
 │   ├── disko.nix         ESP + ext4 root, shared by all hosts
 │   └── README.md         the installation guide
 ├── system/               OS settings, one topic per file
-│   ├── boot  nix  network  locale  audio  bluetooth  fonts  login  polkit  xdg
+│   ├── boot  nix  network  locale  audio  bluetooth  fonts  libvirt  login  polkit  xdg
 │   └── theme/            palette.nix (THE colours) + theme.nix (GTK/Qt/cursor/TTY)
 ├── programs/             one folder per program: <name>.nix + its native config file(s)
 │   ├── niri/             niri.nix + config.kdl
@@ -48,12 +48,13 @@ modules/
 │   ├── zed/              zed.nix (+ palette theme) + settings.json
 │   ├── git/  mpv/  mangohud/  (+ config file)    btop/  imv/  bat/  (settings inline)
 │   ├── firefox/ thunar/ steam/ gamemode/ gamescope/ prismlauncher/ lutris/ openrgb/
-│   ├── shortwave/ rnote/ libreoffice/ rustdesk/ mediawriter/ claude-code/ fresh/
+│   ├── shortwave/ rnote/ libreoffice/ rustdesk/ mediawriter/ claude-code/ fresh/ virt-manager/
 │   └── nix-tools/ (nixd, nil, alejandra)   cli/ (small tools, no config)
 ├── grouped/              bundles a host picks from
 │   ├── base.nix          every machine: boot, nix, network, locale, zsh, git, btop, bat, cli
 │   ├── desktop.nix       login, polkit, audio, theme, niri, noctalia, alacritty, firefox, zed, apps, ...
-│   └── gaming.nix        steam, gamemode, gamescope, mangohud, prismlauncher, lutris
+│   ├── gaming.nix        steam, gamemode, gamescope, mangohud, prismlauncher, lutris
+│   └── vm.nix            virtual machines: KVM/QEMU/libvirt + virt-manager
 ├── users/
 │   └── slider.nix
 └── hosts/
@@ -190,6 +191,7 @@ menu, so a broken change is never a disaster (see
 | Zed defaults | `programs/zed/settings.json` (changes made *inside* Zed are saved by Zed itself) |
 | video player | `programs/mpv/mpv.conf` |
 | in-game overlay | `programs/mangohud/MangoHud.conf` |
+| virtual machines | `system/libvirt.nix` (the machinery) and `programs/virt-manager/virt-manager.nix` (what a new machine starts with) |
 | small command-line tools | `programs/cli/cli.nix` |
 | which programs a machine gets | `grouped/*.nix` and `hosts/<host>/<host>.nix` |
 | which app opens which file type | the program's own `.nix` file, see [Default apps](#default-apps) |
@@ -343,6 +345,82 @@ They can be combined: `gamemoderun mangohud %command%`.
 - The very first Steam start downloads ~500 MB of updates, it just looks
   stuck. Wait.
 - Minecraft: Prism Launcher. Battle.net, GOG and emulators: Lutris.
+
+## Virtual machines
+
+**How it works:** the CPU can run a second operating system by itself. KVM
+(in the kernel) gives the guest real CPU cores instead of imitating them,
+QEMU builds the rest of the PC around them (disk, network, screen) and
+libvirt keeps the machines and starts them. The window you work in is
+**Virtual Machine Manager** in the launcher. Everything the usual guides make
+you do by hand — install the packages, enable the service, put your user in
+the `libvirtd` group, start the `default` network — is already done by
+`grouped/vm.nix`.
+
+Machines and their disks live in `/var/lib/libvirt/images`, not in this repo.
+They survive rebuilds; deleting a machine in the manager deletes them.
+
+### A machine that feels like real hardware
+
+Download an ISO first. Then **File → New Virtual Machine → Local install
+media**, pick the ISO, give it memory and CPUs, and on the last page tick
+**Customize configuration before install**. That opens the machine's settings
+before it boots for the first time:
+
+| page | set | why |
+|---|---|---|
+| Memory | `16384` MiB | the guest's RAM. zeus has 64 GB, so 16 for the guest and plenty left for the host |
+| CPUs → vCPU allocation | `16` | zeus has 32 threads; half for the guest, half stays with the host |
+| CPUs → Topology | 1 socket, 8 cores, 2 threads | the guest sees one 8-core CPU with hyperthreading instead of 16 separate sockets — Windows and most schedulers handle that much better |
+| CPUs → Model | `host-passthrough` | already set: the guest sees zeus' real CPU with all its instructions. The biggest single speed setting |
+| Overview → Firmware | `UEFI` | already set: guests boot like a modern PC. Windows 11 needs it |
+| Overview → Chipset | `Q35` | the modern virtual mainboard (PCIe, UEFI). The wizard picks it for anything recent |
+| Disk 1 → Disk bus | `VirtIO` | the guest talks to the disk directly instead of through an emulated SATA controller — the biggest difference in disk speed |
+| Disk 1 → Advanced → Discard mode | `unmap` | deleting files in the guest gives the space back on the host |
+| NIC → Device model | `virtio` | the same idea for the network card |
+| Display Spice | keep Spice | clipboard, automatic resolution, USB devices |
+| Video | `Virtio`, and tick 3D acceleration for a Linux guest | lets the guest use zeus' GPU for the desktop |
+| TPM (Add Hardware → TPM) | emulated TPM 2.0, only for Windows 11 | Windows 11 refuses to install without one |
+
+Then **Begin Installation**. Memory, CPUs and disk can be changed later in the
+machine's settings while it is shut down.
+
+The pointer is released from the machine's window with **Ctrl + Alt**.
+
+### The other half: the guest
+
+The last bit of "feels like hardware" happens *inside* the machine. Without
+it the screen stays at 1024x768 and the clipboard is separate.
+
+- **Linux guest:** install its `spice-vdagent` and `qemu-guest-agent`
+  packages. On a NixOS guest, two lines do it:
+
+  ```nix
+  services.spice-vdagentd.enable = true;
+  services.qemuGuest.enable = true;
+  ```
+
+- **Windows guest:** Windows has no VirtIO drivers, so the installer shows no
+  disk. Get the driver ISO:
+
+  ```
+  nix build --no-link --print-out-paths nixpkgs#virtio-win.src
+  ```
+
+  Attach the path it prints as a second CD-ROM (Add Hardware → Storage →
+  Device type CDROM), and during the Windows setup click *Load driver* →
+  the `viostor` folder. After the install, run `virtio-win-guest-tools.exe`
+  from the same ISO for the rest (network, display, clipboard).
+
+### Handy extras
+
+- **A shared folder:** Add Hardware → Filesystem, source `/mnt/data`, target
+  tag `data`. In a Linux guest: `mount -t virtiofs data /mnt/data`.
+- **A USB stick or controller in the guest:** Virtual Machine → Redirect USB
+  device, while the machine runs.
+- **Snapshots:** the camera icon in the machine's window. Takes a picture of
+  the whole machine you can jump back to (qcow2 disks can do this).
+- **Every knob libvirt has:** the XML tab in the machine's details.
 
 ## Saving changes to GitHub
 

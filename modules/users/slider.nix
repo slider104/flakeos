@@ -13,6 +13,7 @@
         "input"
         "gamemode" # lets gamemode tune CPU/GPU without a password prompt (ignored if gaming isn't installed)
         "ydotool" # lets the autoclicker click (programs/ydotool; ignored if it isn't installed)
+        "libvirtd" # lets you run virtual machines without sudo (grouped/vm; ignored if it isn't installed)
       ];
       shell = config.programs.zsh.package; # the wrapped zsh (programs/zsh)
 

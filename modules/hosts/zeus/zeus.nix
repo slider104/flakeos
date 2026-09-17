@@ -12,6 +12,7 @@
       base
       desktop
       gaming
+      vm
       openrgb
       rustdesk
       libreoffice
