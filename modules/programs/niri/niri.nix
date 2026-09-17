@@ -54,6 +54,7 @@ in {
 
   flake.nixosModules.niri = {
     config,
+    lib,
     pkgs,
     ...
   }: {
@@ -73,6 +74,36 @@ in {
       xwayland-satellite # X11 apps (Steam!) - niri starts it on demand
       wl-clipboard
       playerctl # media keys
+
+      # XWayland has its own clipboard, and xwayland-satellite does not carry
+      # what an X11 program copies over to niri, nor the other way round. This
+      # mirrors the two in both directions - X11 programs in general, and the
+      # clipboard of a virtual machine (programs/virt-manager/README.md), which
+      # travels through XWayland on both machines. The two comparisons stop the
+      # halves from bouncing the same value back and forth forever.
+      (writeShellScriptBin "niri-clipboard-bridge" ''
+        export PATH=${lib.makeBinPath [wl-clipboard xclip clipnotify]}:$PATH
+        export DISPLAY=''${DISPLAY:-:0}
+
+        # niri -> XWayland
+        while :; do
+          wl-paste --type text --watch sh -c '
+            new=$(cat)
+            [ "$new" = "$(xclip -selection clipboard -o -t UTF8_STRING 2>/dev/null)" ] && exit 0
+            printf %s "$new" | xclip -selection clipboard -i
+          '
+          sleep 1
+        done &
+
+        # XWayland -> niri
+        while :; do
+          clipnotify -s clipboard 2>/dev/null || { sleep 2; continue; }
+          new=$(xclip -selection clipboard -o -t UTF8_STRING 2>/dev/null) || continue
+          [ -z "$new" ] && continue
+          [ "$new" = "$(wl-paste --no-newline 2>/dev/null)" ] && continue
+          printf %s "$new" | wl-copy
+        done
+      '')
     ];
   };
 }

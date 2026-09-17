@@ -12,6 +12,9 @@
 // Bar, launcher, notifications, wallpaper, lock screen, OSD.
 spawn-at-startup "noctalia-shell"
 
+// Keeps the clipboard of X11 programs and of niri the same (programs/niri).
+spawn-at-startup "niri-clipboard-bridge"
+
 // ----------------------------------------------------------------------------
 // Input
 // ----------------------------------------------------------------------------
