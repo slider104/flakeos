@@ -16,7 +16,6 @@
       alacritty
       firefox
       zed
-      fresh
       nix-tools # nixd, nil, alejandra for the editors
       claude-code
       thunar
@@ -24,7 +23,6 @@
       imv
       shortwave
       rnote
-      libreoffice
       mediawriter
       ydotool # autoclicker ("Autoclicker" in the launcher)
     ];

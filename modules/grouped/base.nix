@@ -14,6 +14,7 @@
       git
       btop
       fastfetch
+      fresh
       bat
       cli
     ];

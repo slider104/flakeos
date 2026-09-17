@@ -14,6 +14,7 @@
       bluetooth
       # gaming
       rustdesk
+      libreoffice
 
       slider
 

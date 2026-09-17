@@ -14,6 +14,7 @@
       gaming
       openrgb
       rustdesk
+      libreoffice
 
       slider
 
