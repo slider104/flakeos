@@ -10,6 +10,7 @@ in {
       color_theme = "TTY";
       theme_background = false;
       update_ms = 1000;
+      proc_filter_kernel = true;
     };
   };
 
