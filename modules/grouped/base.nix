@@ -8,6 +8,7 @@
       network
       locale
       reboot
+      nix-ld
 
       # programs/
       zsh
