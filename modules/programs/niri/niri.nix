@@ -70,6 +70,37 @@ in {
     # Electron/Chromium apps run as native Wayland apps instead of via X11.
     environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
+    # xwayland-satellite 0.8.2 gave keyboard focus to override-redirect X11
+    # windows. Steam's menus ARE such windows: the menu opened, took focus,
+    # Steam saw its main window lose focus and closed the menu again - the
+    # flicker. Upstream fixed it (PR #494, merged 2026-09-09): never focus
+    # override-redirect popups, and offer WM_TAKE_FOCUS to windows that ask
+    # for it. There is no release with the fix yet (0.8.2 is from 2026-07-22),
+    # so build the commit itself.
+    #
+    # DELETE THIS once nixpkgs carries 0.8.3 or later:
+    #   nix eval nixpkgs#xwayland-satellite.version
+    nixpkgs.overlays = [
+      (_final: prev: {
+        xwayland-satellite = prev.xwayland-satellite.overrideAttrs (finalAttrs: _: {
+          version = "0.8.2-unstable-2026-09-09";
+          src = prev.fetchFromGitHub {
+            owner = "Supreeeme";
+            repo = "xwayland-satellite";
+            rev = "add2795134593faafce60e404a0a75df68e9ee0c";
+            hash = "sha256-0TxfMgqW0/BLD4M942c5DCKYrtPvzsPJwvdcco4LQUM=";
+          };
+          # The dependency tree moved on since the 0.8.2 tag, so the vendored
+          # crates need their own hash. `overrideAttrs` cannot reach the
+          # package's `cargoHash`, hence replacing `cargoDeps` outright.
+          cargoDeps = prev.rustPlatform.fetchCargoVendor {
+            inherit (finalAttrs) src;
+            hash = "sha256-s1gl9eR6Mt2QLrhfcowstPFjzwE/lz4PJhJzWYHoIHg=";
+          };
+        });
+      })
+    ];
+
     environment.systemPackages = with pkgs; [
       xwayland-satellite # X11 apps (Steam!) - niri starts it on demand
       wl-clipboard

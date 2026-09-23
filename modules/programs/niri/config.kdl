@@ -26,7 +26,7 @@ input {
         }
         numlock
         repeat-delay 200
-        repeat-rate 40
+        repeat-rate 40 // fast: see the repeat=false note under "Key binds"
     }
 
     touchpad {
@@ -118,6 +118,12 @@ window-rule {
 
 // ----------------------------------------------------------------------------
 // Key binds
+//
+// repeat=false on everything that starts a program or toggles a panel. Key
+// repeat is deliberately fast above (200 ms, then 40/s), so holding such a
+// bind a moment too long would fire it dozens of times - Mod+G launched
+// several Steam sessions at once. Repeat stays on where it helps: focus,
+// movement, resizing, volume, brightness.
 // ----------------------------------------------------------------------------
 
 binds {
@@ -125,31 +131,31 @@ binds {
     Mod+BackSpace                   hotkey-overlay-title="Hotkeys" { show-hotkey-overlay; }
 
     // System (noctalia).
-    Mod+Alt+L                       hotkey-overlay-title="Session menu (lock, suspend, power off)" { spawn "noctalia-shell" "ipc" "call" "sessionMenu" "toggle"; }
-    Mod+Comma                       hotkey-overlay-title="Noctalia settings" { spawn "noctalia-shell" "ipc" "call" "settings" "toggle"; }
-    Mod+W                           hotkey-overlay-title="Pick wallpaper" { spawn "noctalia-shell" "ipc" "call" "wallpaper" "toggle"; }
-    Mod+Shift+Alt+L                 hotkey-overlay-title="Power off monitors" { power-off-monitors; }
+    Mod+Alt+L                       repeat=false hotkey-overlay-title="Session menu (lock, suspend, power off)" { spawn "noctalia-shell" "ipc" "call" "sessionMenu" "toggle"; }
+    Mod+Comma                       repeat=false hotkey-overlay-title="Noctalia settings" { spawn "noctalia-shell" "ipc" "call" "settings" "toggle"; }
+    Mod+W                           repeat=false hotkey-overlay-title="Pick wallpaper" { spawn "noctalia-shell" "ipc" "call" "wallpaper" "toggle"; }
+    Mod+Shift+Alt+L                 repeat=false hotkey-overlay-title="Power off monitors" { power-off-monitors; }
     Mod+Ctrl+Shift+Q                hotkey-overlay-title="Exit niri session" { quit; }
 
     // Capture.
-    Mod+S                           hotkey-overlay-title="Screenshot (window)" { screenshot-window; }
-    Mod+Ctrl+S                      hotkey-overlay-title="Screenshot (monitor: focused)" { screenshot-screen; }
-    Mod+Ctrl+Shift+S                hotkey-overlay-title="Screenshot (monitor: all)" { screenshot; }
+    Mod+S                           repeat=false hotkey-overlay-title="Screenshot (window)" { screenshot-window; }
+    Mod+Ctrl+S                      repeat=false hotkey-overlay-title="Screenshot (monitor: focused)" { screenshot-screen; }
+    Mod+Ctrl+Shift+S                repeat=false hotkey-overlay-title="Screenshot (monitor: all)" { screenshot; }
 
     // Notifications (noctalia).
-    Mod+N                           hotkey-overlay-title="Notification history" { spawn "noctalia-shell" "ipc" "call" "notifications" "toggleHistory"; }
-    Mod+Shift+N                     hotkey-overlay-title="Dismiss oldest notification" { spawn "noctalia-shell" "ipc" "call" "notifications" "dismissOldest"; }
-    Mod+Ctrl+N                      hotkey-overlay-title="Dismiss all notifications" { spawn "noctalia-shell" "ipc" "call" "notifications" "dismissAll"; }
+    Mod+N                           repeat=false hotkey-overlay-title="Notification history" { spawn "noctalia-shell" "ipc" "call" "notifications" "toggleHistory"; }
+    Mod+Shift+N                     repeat=false hotkey-overlay-title="Dismiss oldest notification" { spawn "noctalia-shell" "ipc" "call" "notifications" "dismissOldest"; }
+    Mod+Ctrl+N                      repeat=false hotkey-overlay-title="Dismiss all notifications" { spawn "noctalia-shell" "ipc" "call" "notifications" "dismissAll"; }
 
     // Launcher (noctalia).
-    Mod+Space                       hotkey-overlay-title="Launcher" { spawn "noctalia-shell" "ipc" "call" "launcher" "toggle"; }
+    Mod+Space                       repeat=false hotkey-overlay-title="Launcher" { spawn "noctalia-shell" "ipc" "call" "launcher" "toggle"; }
 
     // Apps.
-    Mod+Return                      hotkey-overlay-title="Terminal" { spawn "alacritty"; }
-    Mod+B                           hotkey-overlay-title="Firefox" { spawn "firefox"; }
-    Mod+E                           hotkey-overlay-title="Files" { spawn "thunar"; }
-    Mod+Z                           hotkey-overlay-title="Zed editor" { spawn "zeditor"; }
-    Mod+G                           hotkey-overlay-title="Steam" { spawn "steam"; }
+    Mod+Return                      repeat=false hotkey-overlay-title="Terminal" { spawn "alacritty"; }
+    Mod+B                           repeat=false hotkey-overlay-title="Firefox" { spawn "firefox"; }
+    Mod+E                           repeat=false hotkey-overlay-title="Files" { spawn "thunar"; }
+    Mod+Z                           repeat=false hotkey-overlay-title="Zed editor" { spawn "zeditor"; }
+    Mod+G                           repeat=false hotkey-overlay-title="Steam" { spawn "steam"; }
 
     // Windows and columns.
     Mod+O                           repeat=false hotkey-overlay-title="Overview" { toggle-overview; }
