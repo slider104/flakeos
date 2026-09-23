@@ -155,7 +155,7 @@ binds {
     Mod+B                           repeat=false hotkey-overlay-title="Firefox" { spawn "firefox"; }
     Mod+E                           repeat=false hotkey-overlay-title="Files" { spawn "thunar"; }
     Mod+Z                           repeat=false hotkey-overlay-title="Zed editor" { spawn "zeditor"; }
-    Mod+G                           repeat=false hotkey-overlay-title="Steam" { spawn "steam"; }
+    Mod+G                           repeat=false hotkey-overlay-title="Steam" { spawn "steam-launch"; }
 
     // Windows and columns.
     Mod+O                           repeat=false hotkey-overlay-title="Overview" { toggle-overview; }
