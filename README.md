@@ -354,6 +354,13 @@ So a saved setting is what the program *starts out* with, and changing it in
 the program still works. `dconf-changes` is the bridge: it shows what you
 changed and writes it into the repo.
 
+Here is a quick overview of the dconf helper commands with the rnote example.
+More details further down in this section.
+dconf-changes                  which programs did I change something in?
+dconf-changes rnote            show those changes
+dconf-changes rnote --save     write them to modules/programs/rnote/dconf/rnote
+dconf-changes rnote --all      also show keys the repo already sets
+
 ### Does my program work this way?
 
 There is no list to look up — just try it. Change something in the program,
