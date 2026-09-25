@@ -25,8 +25,8 @@ input {
             layout "de"
         }
         numlock
-        repeat-delay 200
-        repeat-rate 40 // fast: see the repeat=false note under "Key binds"
+        repeat-delay 400
+        repeat-rate 30
     }
 
     touchpad {
