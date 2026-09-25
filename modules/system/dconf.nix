@@ -30,7 +30,9 @@
                                            modules/programs/<program>/dconf/<program>
 
         Options:
-          --all   also show keys this config already sets to the same value
+          --all   hold nothing back: also show the keys this config already sets
+                  to the same value, and the ones on an "# ignore:" line.
+                  For looking only - it cannot be used with --save.
           --help  this text
         USAGE
         }
@@ -60,6 +62,14 @@
               ;;
           esac
         done
+
+        # --all switches the filters off, so saving with it would write the
+        # very keys an "# ignore:" line says to keep out.
+        if [ "$save" = true ] && [ "$all" = true ]; then
+          echo "dconf-changes: --all is for looking, not for saving." >&2
+          echo "To keep an ignored key, take it off the '# ignore:' line first." >&2
+          exit 1
+        fi
 
         tmp=$(mktemp -d)
         trap 'rm -rf "$tmp"' EXIT
@@ -122,7 +132,7 @@
             i = index($0, "="); if (i == 0) next
             k = substr($0, 1, i - 1); v = substr($0, i + 1)
             if (index(tolower(sec), tolower(name)) == 0) next
-            if (index(ignore, " " k " ") > 0) next
+            if (all != "true" && index(ignore, " " k " ") > 0) next
             if (all != "true" && (sec SUBSEP k) in def && def[sec SUBSEP k] == v) next
             if (!(sec in seen)) { seen[sec] = 1; order[++n] = sec }
             out[sec] = out[sec] k "=" v "\n"
@@ -152,7 +162,12 @@
 
         if [ "$save" = false ]; then
           cat "$tmp/changes.ini"
-          echo "Keep it:  dconf-changes $name --save"
+          if [ "$all" = true ]; then
+            echo "That is everything, filters off. Saving keeps only what"
+            echo "'dconf-changes $name' (without --all) shows."
+          else
+            echo "Keep it:  dconf-changes $name --save"
+          fi
           exit 0
         fi
 
