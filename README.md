@@ -137,6 +137,7 @@ The shell is zsh. These aliases are defined in `programs/zsh/zshrc`:
 | `ncg` | delete old system versions (generations) older than 30 days, frees disk space |
 | `ll` | `ls -lah`: list all files with sizes |
 | `noctalia-changes` | show what you changed in noctalia's settings panel (see below) |
+| `dconf-changes` | show what you changed in a GTK app that saves its own settings (rnote, Shortwave, virt-manager) |
 
 - `nrs`, `nrb`, `nup` work the same on every machine: the flake picks the
   config whose name matches the hostname (`zeus`, `hermes`).
@@ -404,10 +405,15 @@ The four ways a program's settings are kept here:
   ```
   It goes to `modules/programs/rnote/dconf/rnote`.
 - Throw out what you don't want to keep. Window sizes and "last opened"
-  paths end up in there too — open the file and delete those lines:
+  paths end up in there too — open the file:
   ```sh
   zeditor ~/flakeos/modules/programs/rnote/dconf/rnote
   ```
+  **Deleting the line is not enough.** The setting is still in your own copy
+  of dconf, so the next `--save` puts it straight back. Delete the line *and*
+  write the key on the `# ignore:` line at the top of the file (several keys
+  separated by spaces, or several `# ignore:` lines) — that is how
+  `rnote/dconf/rnote` keeps `window-width` and friends out for good.
 - New file? Tell git, look at it, rebuild:
   ```sh
   cd ~/flakeos
@@ -445,6 +451,9 @@ The four ways a program's settings are kept here:
   `dconf dump` prints. Nothing is translated, so nothing can be translated
   wrong — but some programs (rnote) squeeze all their settings into one very
   long line. That is normal.
+- A key on an `# ignore:` line is never saved, and never shown by
+  `dconf-changes <program>` either — so what you see is what you get.
+  `--all` shows it anyway.
 - `--save` **merges**: your comments and settings you saved earlier stay,
   only the keys you just changed are replaced. Saving twice in a row changes
   nothing.

@@ -98,10 +98,19 @@
           exit 0
         fi
 
+        # Keys you never want to keep: the "# ignore:" line(s) in the keyfile.
+        # Just deleting a key from the file is not enough - it is still in
+        # your own copy of dconf, so the next --save would put it right back.
+        keyfile="$repo/modules/programs/$name/dconf/$name"
+        ignore=" "
+        if [ -e "$keyfile" ]; then
+          ignore=" $(sed -n 's/^# *ignore: *//p' "$keyfile" | tr '\n' ' ') "
+        fi
+
         # Everything under a path whose name contains what you typed
         # (rnote -> /com/github/flxzt/rnote/), minus the keys this config
-        # already sets to the very same value.
-        gawk -v name="$name" -v all="$all" '
+        # already sets to the very same value, minus the ignored ones.
+        gawk -v name="$name" -v all="$all" -v ignore="$ignore" '
           FNR == NR {
             if ($0 ~ /^\[/) { dsec = substr($0, 2, length($0) - 2); next }
             i = index($0, "="); if (i == 0) next
@@ -113,6 +122,7 @@
             i = index($0, "="); if (i == 0) next
             k = substr($0, 1, i - 1); v = substr($0, i + 1)
             if (index(tolower(sec), tolower(name)) == 0) next
+            if (index(ignore, " " k " ") > 0) next
             if (all != "true" && (sec SUBSEP k) in def && def[sec SUBSEP k] == v) next
             if (!(sec in seen)) { seen[sec] = 1; order[++n] = sec }
             out[sec] = out[sec] k "=" v "\n"
@@ -154,13 +164,17 @@
           exit 1
         fi
 
-        keyfile="$moduleDir/dconf/$name"
         mkdir -p "$moduleDir/dconf"
         if [ ! -e "$keyfile" ]; then
           {
             echo "# Settings for $name, saved with 'dconf-changes $name --save'."
-            echo "# Loaded by $name.nix as a dconf default. Comments and hand-made"
-            echo "# edits survive the next --save; delete a line to stop keeping it."
+            echo "# Loaded by $name.nix as a dconf default. Your comments and edits"
+            echo "# survive the next --save."
+            echo "#"
+            echo "# Don't want a key kept? Delete its line AND write the key here,"
+            echo "# separated by spaces - otherwise the next --save brings it back,"
+            echo "# because it is still in your own copy of dconf:"
+            echo "# ignore:"
           } > "$keyfile"
         fi
 
@@ -225,9 +239,11 @@
         echo
         cat "$tmp/changes.ini"
         echo "Next:"
-        echo "  1. git diff          look at what was added"
-        echo "  2. nrs               build it into the system"
-        echo "  3. dconf reset -f /$resetPath/"
+        echo "  1. cd $repo"
+        echo "  2. git add -A         so the flake sees the file (it is new)"
+        echo "  3. git diff HEAD      look at what was added"
+        echo "  4. nrs                build it into the system"
+        echo "  5. dconf reset -f /$resetPath/"
         echo "     Drops your own copy so the repo's version is the one in use."
         echo "     It also drops everything else under /$resetPath/ that you did"
         echo "     not save (window sizes, recent files). Close $name first."
