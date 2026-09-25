@@ -37,7 +37,7 @@ input {
 
     mouse {
         accel-profile "flat"
-        scroll-factor 2.0
+        scroll-factor 1.0
     }
 
     warp-mouse-to-focus
@@ -108,6 +108,12 @@ window-rule {
 window-rule {
     match app-id=r#"^steam$"# title=r#"Friends"#
     default-column-width { proportion 0.1; }
+}
+
+// Firefox: full width.
+window-rule {
+    match app-id=r#"^firefox$"#
+    default-column-width { proportion 1.0; }
 }
 
 // Autoclicker window (programs/ydotool): floating instead of a column.
