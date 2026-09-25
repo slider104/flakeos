@@ -146,7 +146,7 @@ binds {
     // Capture.
     Mod+S                           repeat=false hotkey-overlay-title="Screenshot (window)" { screenshot-window; }
     Mod+Ctrl+S                      repeat=false hotkey-overlay-title="Screenshot (monitor: focused)" { screenshot-screen; }
-    Mod+Ctrl+Shift+S                repeat=false hotkey-overlay-title="Screenshot (monitor: all)" { screenshot; }
+    Mod+Shift+S                     repeat=false hotkey-overlay-title="Screenshot (select region)" { screenshot; }
 
     // Notifications (noctalia).
     Mod+N                           repeat=false hotkey-overlay-title="Notification history" { spawn "noctalia-shell" "ipc" "call" "notifications" "toggleHistory"; }
