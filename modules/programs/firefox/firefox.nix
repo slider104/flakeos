@@ -24,6 +24,21 @@
         # Start with the windows and tabs from last time.
         Homepage.StartPage = "previous-session";
 
+        # New tab page: the search box and your own most-visited sites, nothing
+        # else. Off go the sponsored shortcuts (the tiles marked "Sponsored"),
+        # the recommended-stories feed below them and the snippets. Locked, so
+        # the gear menu on the new tab page can't switch them back on.
+        FirefoxHome = {
+          Search = true;
+          TopSites = true;
+          SponsoredTopSites = false;
+          Highlights = false;
+          Pocket = false;
+          SponsoredPocket = false;
+          Snippets = false;
+          Locked = true;
+        };
+
         # Extensions, installed and kept up to date automatically. The key is
         # the extension's ID; the URL's slug is its addons.mozilla.org name.
         ExtensionSettings = {
@@ -59,6 +74,22 @@
           };
           "browser.translations.alwaysTranslateLanguages" = {
             Value = "";
+            Status = "locked";
+          };
+          # The weather box on the new tab page. FirefoxHome above has no
+          # switch for it, so it goes off here.
+          "browser.newtabpage.activity-stream.showWeather" = {
+            Value = false;
+            Status = "locked";
+          };
+          # Belt and braces for the stories feed: recent Firefox serves it
+          # through the "discovery stream", which ignores the Pocket policy.
+          "browser.newtabpage.activity-stream.feeds.section.topstories" = {
+            Value = false;
+            Status = "locked";
+          };
+          "browser.newtabpage.activity-stream.discoverystream.enabled" = {
+            Value = false;
             Status = "locked";
           };
         };
