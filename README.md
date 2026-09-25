@@ -198,6 +198,7 @@ menu, so a broken change is never a disaster (see
 | which programs a machine gets | `grouped/*.nix` and `hosts/<host>/<host>.nix` |
 | which app opens which file type | the program's own `.nix` file, see [Default apps](#default-apps) |
 | automatic cleanup, unfree software | `system/nix.nix` |
+| settings a program saves by itself (rnote, Shortwave, virt-manager) | nothing to edit by hand: `dconf-changes <program> --save`, see [Keeping GTK app settings (dconf)](#keeping-gtk-app-settings-dconf) |
 | autoclicker | the Autoclicker window (saves by itself); how it works: `programs/ydotool/ydotool.nix` |
 | RGB colours (zeus) | `programs/openrgb/openrgb.nix` |
 | the data drive (zeus) | `hosts/zeus/zeus.nix` |
@@ -223,6 +224,8 @@ niri, noctalia, alacritty, zsh, git, btop, mpv, imv, mangohud and bat are
   `settings.json` stays yours: changes made in Zed are saved there and win
   over our defaults.
 - A wrapped program's config is the same for every user on the machine.
+- Not wrapped *and* no config file to edit? Then it saves into dconf, see
+  [Keeping GTK app settings (dconf)](#keeping-gtk-app-settings-dconf).
 
 ## Updating
 
@@ -329,6 +332,121 @@ Good to know:
   (`system/theme/palette.nix`).
 - The wallpaper you pick with Mod+W isn't a setting (see
   [Wallpapers](#wallpapers)).
+
+## Keeping GTK app settings (dconf)
+
+**How it works:** most programs here are *wrapped* — their config is a file
+in this repo, baked in at rebuild. But some programs have no config file at
+all. Rnote, Shortwave, virt-manager and the GTK file-picker keep everything
+in **dconf**: a settings database in `~/.config/dconf/user`. It is not a
+text file, it is not in the repo, and on a fresh install it starts empty, so
+every pen, colour and preference you set up is gone.
+
+This config can put settings into dconf as well. They land in
+`/etc/dconf/db/`, *underneath* your own copy:
+
+| where | what it is |
+|---|---|
+| `~/.config/dconf/user` | what you changed in the program. This one wins. |
+| `/etc/dconf/db/…` | what this repo installs. Used until you change it. |
+
+So a saved setting is what the program *starts out* with, and changing it in
+the program still works. `dconf-changes` is the bridge: it shows what you
+changed and writes it into the repo.
+
+### Does my program work this way?
+
+There is no list to look up — just try it. Change something in the program,
+close it, then:
+
+```sh
+dconf-changes
+```
+
+- The program is in the list → it uses dconf, carry on below.
+- Not in the list → look for a config file instead:
+  ```sh
+  ls ~/.config
+  ```
+  A folder with your program's name means it writes a config file, and that
+  is a different job (a wrapper, see
+  [`blueprints/README.md`](blueprints/README.md)). Nothing at all? Then it
+  saves somewhere of its own; Steam, Lutris and Firefox profiles are like
+  that, and they are not worth chasing.
+
+The four ways a program's settings are kept here:
+
+| kind | example | kept by |
+|---|---|---|
+| takes a config file or option | niri, alacritty, mpv | wrapping it — the file lives in `modules/programs/<name>/` |
+| dconf, no config file | rnote, Shortwave, virt-manager | `dconf-changes <name> --save` |
+| reads `/etc/xdg/…` as well as `~/.config` | Thunar's right-click menu, GTK fonts | `environment.etc."xdg/…"` in the module |
+| own format, own place | Steam, Firefox profiles | not kept — set it up again |
+
+### Saving what you changed
+
+- Set the program up the way you like it, then close it.
+- See what you changed (`rnote` is the name of its folder in
+  `modules/programs/`):
+  ```sh
+  dconf-changes rnote
+  ```
+- Write it into the repo:
+  ```sh
+  dconf-changes rnote --save
+  ```
+  It goes to `modules/programs/rnote/dconf/rnote`.
+- Throw out what you don't want to keep. Window sizes and "last opened"
+  paths end up in there too — open the file and delete those lines:
+  ```sh
+  zeditor ~/flakeos/modules/programs/rnote/dconf/rnote
+  ```
+- New file? Tell git, look at it, rebuild:
+  ```sh
+  cd ~/flakeos
+  ```
+  ```sh
+  git add -A
+  ```
+  ```sh
+  git diff HEAD
+  ```
+  ```sh
+  nrs
+  ```
+- **Only for a program that has never had a `dconf/` folder:** the module
+  has to load it. One line in `modules/programs/rnote/rnote.nix`, inside the
+  `flake.nixosModules.rnote = { … }` block (`rnote.nix` already has it —
+  copy from there):
+  ```nix
+  programs.dconf.profiles.user.databases = [{keyfiles = [./dconf];}];
+  ```
+
+### Good to know
+
+- **Your own copy still wins.** After the rebuild the setting is in the repo
+  *and* still in `~/.config/dconf/user`, so nothing looks different — but
+  editing the repo file by hand now does nothing. To hand control over to
+  the repo, close the program and drop your copy:
+  ```sh
+  dconf reset -f /com/github/flxzt/rnote/
+  ```
+  `dconf-changes --save` prints the exact path to use. It clears *everything*
+  under that path that you did not save, which is the point, but check the
+  file first.
+- The saved file is dconf's own format, one line per setting, exactly what
+  `dconf dump` prints. Nothing is translated, so nothing can be translated
+  wrong — but some programs (rnote) squeeze all their settings into one very
+  long line. That is normal.
+- `--save` **merges**: your comments and settings you saved earlier stay,
+  only the keys you just changed are replaced. Saving twice in a row changes
+  nothing.
+- Settings that already match the repo are left out, so you only ever see
+  what is actually new. `dconf-changes rnote --all` shows them anyway.
+- These settings are for everyone on the machine, like a wrapped config.
+- Want the repo to win *always*, GUI or not? Add `lockAll = true;` next to
+  `keyfiles`. The program's setting then can't be changed any more, so this
+  is for things that must not drift, not for everyday use.
 
 ## Gaming
 

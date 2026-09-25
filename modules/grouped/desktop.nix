@@ -7,6 +7,7 @@
       polkit
       xdg
       audio
+      dconf
       fonts
       theme
 
