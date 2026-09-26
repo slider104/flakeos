@@ -16,6 +16,7 @@
       noctalia
       alacritty
       firefox
+      brave # 2nd browser, for WebHID sites (iocenter.bequiet.com)
       zed
       nix-tools # nixd, nil, alejandra for the editors
       claude-code

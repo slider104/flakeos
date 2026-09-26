@@ -47,13 +47,13 @@ modules/
 │   ├── zsh/              zsh.nix + zshrc
 │   ├── zed/              zed.nix (+ palette theme) + settings.json
 │   ├── git/  mpv/  mangohud/  (+ config file)    btop/  imv/  bat/  (settings inline)
-│   ├── firefox/ thunar/ steam/ gamemode/ gamescope/ prismlauncher/ lutris/ openrgb/
+│   ├── firefox/ brave/ thunar/ steam/ gamemode/ gamescope/ prismlauncher/ lutris/ openrgb/
 │   ├── shortwave/ rnote/ libreoffice/ rustdesk/ mediawriter/ claude-code/ fresh/
 │   ├── virt-manager/     virt-manager.nix + README.md (the guide for VMs)
 │   └── nix-tools/ (nixd, nil, alejandra)   cli/ (small tools, no config)
 ├── grouped/              bundles a host picks from
 │   ├── base.nix          every machine: boot, nix, network, locale, zsh, git, btop, bat, cli
-│   ├── desktop.nix       login, polkit, audio, theme, niri, noctalia, alacritty, firefox, zed, apps, ...
+│   ├── desktop.nix       login, polkit, audio, theme, niri, noctalia, alacritty, firefox, brave, zed, apps, ...
 │   ├── gaming.nix        steam, gamemode, gamescope, mangohud, prismlauncher, lutris
 │   └── vm.nix            virtual machines: KVM/QEMU/libvirt + virt-manager
 ├── users/
@@ -191,6 +191,7 @@ menu, so a broken change is never a disaster (see
 | aliases, prompt, shell history | `programs/zsh/zshrc` |
 | git name and e-mail | `programs/git/gitconfig` |
 | Firefox extensions and settings | `programs/firefox/firefox.nix` |
+| Brave extensions and settings (2nd browser) | `programs/brave/brave.nix` |
 | Zed defaults | `programs/zed/settings.json` (changes made *inside* Zed are saved by Zed itself) |
 | video player | `programs/mpv/mpv.conf` |
 | in-game overlay | `programs/mangohud/MangoHud.conf` |
