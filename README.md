@@ -105,6 +105,7 @@ each other (up/down), each with its own strip.
 | Mod+Space | app launcher (type to search, Enter to start) |
 | Mod+Return | terminal (alacritty) |
 | Mod+B / Mod+E / Mod+Z / Mod+G | Firefox / files (Thunar) / Zed / Steam |
+| Mod+Shift+B | Brave (the 2nd browser, for WebHID sites) |
 | Mod+Q | close the window |
 | Mod+Left / Mod+Right | focus the column left / right (Up / Down: windows inside a column) |
 | Mod+Ctrl+arrow keys | move the window / column |

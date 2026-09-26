@@ -110,9 +110,10 @@ window-rule {
     default-column-width { proportion 0.1; }
 }
 
-// Firefox: full width.
+// Firefox and Brave: full width.
 window-rule {
     match app-id=r#"^firefox$"#
+    match app-id=r#"^brave-browser$"#
     default-column-width { proportion 1.0; }
 }
 
@@ -159,6 +160,7 @@ binds {
     // Apps.
     Mod+Return                      repeat=false hotkey-overlay-title="Terminal" { spawn "alacritty"; }
     Mod+B                           repeat=false hotkey-overlay-title="Firefox" { spawn "firefox"; }
+    Mod+Shift+B                     repeat=false hotkey-overlay-title="Brave" { spawn "brave"; }
     Mod+E                           repeat=false hotkey-overlay-title="Files" { spawn "thunar"; }
     Mod+Z                           repeat=false hotkey-overlay-title="Zed editor" { spawn "zeditor"; }
     Mod+G                           repeat=false hotkey-overlay-title="Steam" { spawn "steam-launch"; }
