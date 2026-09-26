@@ -96,11 +96,28 @@
       };
     };
 
-    # /dev/hidraw* belongs to root, so no browser can open it. uaccess hands
-    # the be quiet! controller to whoever is logged in at the screen. Same
-    # shape as the Mystic Light rule in openrgb.nix.
-    services.udev.extraRules = ''
-      SUBSYSTEM=="hidraw", ATTRS{idVendor}=="373f", TAG+="uaccess"
-    '';
+    # /dev/hidraw* belongs to root, so no browser can open it. TAG+="uaccess"
+    # hands the be quiet! controller to whoever is logged in at the screen.
+    #
+    # The tag only does something if it is set *before* systemd's
+    # 73-seat-late.rules, the rule that turns the tag into an ACL on the
+    # device node. udev reads its rule files in name order, and
+    # services.udev.extraRules writes to 99-local.rules - after 73 - so the
+    # tag was being set and nothing ever read it: /dev/hidraw6..9 stayed
+    # crw------- root root and the WebHID picker on iocenter.bequiet.com
+    # came up empty. Shipping the rule as its own file, numbered 60, is the
+    # whole fix. (openrgb.nix can stay in extraRules: TAG+="systemd" is read
+    # by systemd itself, not by an earlier rule file.)
+    #
+    # This is the same rule be quiet!'s own installer writes - the
+    # `wget -qO- https://iocenter.bequiet.com/update-udev.sh | sudo bash`
+    # the site tells you to run. That script writes into /etc/udev/rules.d,
+    # which on NixOS is a read-only symlink into the store, so it fails even
+    # under sudo. Nothing to run by hand; the rebuild puts the file there.
+    services.udev.packages = [
+      (pkgs.writeTextDir "lib/udev/rules.d/60-bequiet.rules" ''
+        SUBSYSTEM=="hidraw", ATTRS{idVendor}=="373f", TAG+="uaccess"
+      '')
+    ];
   };
 }
