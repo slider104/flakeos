@@ -4,7 +4,7 @@
     # are your rollback: pick an older generation in the boot menu.
     boot.loader.systemd-boot = {
       enable = true;
-      configurationLimit = 20;
+      configurationLimit = 30;
     };
     boot.loader.efi.canTouchEfiVariables = true;
 
