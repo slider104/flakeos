@@ -5,6 +5,7 @@
       # system/
       boot
       nix
+      stable
       network
       locale
       reboot

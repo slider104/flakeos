@@ -133,7 +133,7 @@ The shell is zsh. These aliases are defined in `programs/zsh/zshrc`:
 |---|---|
 | `nrs` | **rebuild** the system from `~/flakeos` and switch to it right away |
 | `nrb` | rebuild, but only switch at the next boot (for big changes, e.g. after an update) |
-| `nup` | **update**: fetch the newest versions of everything (`flake.lock`), then `nrb` |
+| `nup` | **update**: fetch the newest versions of everything (`flake.lock`), build, use at the next boot. Build fails? `flake.lock` is put back |
 | `nck` | check the config for errors without building anything |
 | `ncg` | delete old system versions (generations) older than 30 days, frees disk space |
 | `ll` | `ls -lah`: list all files with sizes |
@@ -201,6 +201,7 @@ menu, so a broken change is never a disaster (see
 | which programs a machine gets | `grouped/*.nix` and `hosts/<host>/<host>.nix` |
 | which app opens which file type | the program's own `.nix` file, see [Default apps](#default-apps) |
 | automatic cleanup, unfree software | `system/nix.nix` |
+| a package on unstable is broken | `system/stable.nix` |
 | settings a program saves by itself (rnote, Shortwave, virt-manager) | nothing to edit by hand: `dconf-changes <program> --save`, see [Keeping GTK app settings (dconf)](#keeping-gtk-app-settings-dconf) |
 | autoclicker | the Autoclicker window (saves by itself); how it works: `programs/ydotool/ydotool.nix` |
 | RGB colours (zeus) | `programs/openrgb/openrgb.nix` |
@@ -248,6 +249,40 @@ the next boot.
 - Something doesn't work after the update? Pick the previous generation in
   the boot menu. `flake.lock` is in git, so `git diff flake.lock` shows what
   moved, and `git checkout flake.lock` goes back to the old versions.
+
+`nup` builds everything *before* it changes the boot menu, so an update that
+does not build cannot damage the running system. It also puts `flake.lock`
+back in that case: a failed `nup` leaves you exactly where you were, with
+nothing to undo by hand. (Had you already changed `flake.lock` yourself, it
+is left alone and says so.)
+
+A successful `nup` ends with a list of what actually changes at the next
+boot: package names with their old and new version, and how much the system
+grows or shrinks.
+
+### When a package doesn't build
+
+Unstable moves fast, so now and then a package there is broken for a few
+days - and it can be one you never asked for. In October 2026 `breakpad`
+stopped compiling; noctalia depends on it, so nothing built at all.
+
+You don't have to freeze the whole system for that. `modules/system/stable.nix`
+keeps a second, slower-moving nixpkgs around. Nothing uses it until you say
+so, in one of two ways:
+
+- **One program from stable**, nothing else touched. `pkgs.stable` works like
+  `pkgs` in any module:
+  ```nix
+  environment.systemPackages = [pkgs.stable.inkscape];
+  ```
+- **One package replaced everywhere**, including inside other packages that
+  need it - the breakpad case. Uncomment a line in `system/stable.nix`:
+  ```nix
+  breakpad = final.stable.breakpad; # 2026-10-04: link error, nixpkgs#569271
+  ```
+
+Write next to the line what broke, and delete it again once unstable is
+fixed. The file itself explains both ways and what they cost.
 
 ## Default apps
 
@@ -589,6 +624,8 @@ so the history stays a straight line.
 - **The rebuild failed:** nothing changed, you're still on the old system.
   The last lines of the error name the file and line. The full output is in
   `~/flakeos/logs/`.
+- **A package failed to build after an update:** probably not your doing -
+  unstable had a bad day. See [When a package doesn't build](#when-a-package-doesnt-build).
 - **The rebuild worked, but now something is broken:** reboot, and in the
   boot menu (shown for 5 seconds) pick an older generation. Fix the file,
   `nrs` again.

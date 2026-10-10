@@ -4,6 +4,14 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
+    # The escape hatch for packages that are broken on unstable: a second,
+    # slower-moving nixpkgs to take single packages from. Nothing uses it
+    # until a line in modules/system/stable.nix says so.
+    # It can also point at a known-good unstable commit (a revision out of
+    # flake.lock) instead of the stable release - then the packages are days
+    # old rather than months, and share nearly everything with the system.
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-26.05";
+
     # Flake structure: every *.nix file under ./modules is imported
     # automatically as a flake-parts module (the "dendritic" pattern).
     flake-parts = {

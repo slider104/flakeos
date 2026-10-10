@@ -1,4 +1,5 @@
 {
+  config,
   inputs,
   lib,
   moduleLocation,
@@ -41,7 +42,25 @@
       "aarch64-linux"
     ];
 
-    perSystem = {pkgs, ...}: {
+    perSystem = {
+      system,
+      pkgs,
+      ...
+    }: {
+      # The pkgs the flake's *own* outputs are built from: the wrappers as
+      # packages (`nix build .#noctalia-shell`, `nix run .#zsh`) and the
+      # formatter. A host does not use this one - it gets its own pkgs from
+      # its nixosSystem - so without saying it twice the two would differ.
+      # Both lines below mirror what the hosts have, so a package built by
+      # hand is the same one the system installs:
+      #   allowUnfree    system/nix.nix
+      #   overlays       system/stable.nix (the escape hatch)
+      _module.args.pkgs = import inputs.nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+        overlays = [config.flake.overlays.stable];
+      };
+
       # `nix fmt .` formats the whole repo (the `.` is needed).
       formatter = pkgs.alejandra;
     };

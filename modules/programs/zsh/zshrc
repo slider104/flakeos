@@ -76,6 +76,37 @@ alias nrs='nixlog rebuild sudo nixos-rebuild switch --flake ~/flakeos'        # 
 alias nrb='nixlog rebuild sudo nixos-rebuild boot --flake ~/flakeos'          # rebuild, use on next boot
 alias nck='nixlog check_flake nix flake check ~/flakeos'                      # check the config
 alias ncg='nixlog garbage_collect sudo nix-collect-garbage --delete-older-than 30d'  # clean old generations
-nup() {                                                                       # update inputs + rebuild
-  nixlog update sh -c 'nix flake update --flake ~/flakeos && sudo nixos-rebuild boot --flake ~/flakeos'
+
+# nup: move the pins to the newest versions and use them at the next boot.
+#
+# `nixos-rebuild boot` builds everything first and only touches the boot menu
+# once that worked, so a failed update cannot damage the running system. What
+# it does leave behind is a moved flake.lock - and a plain `nrs` afterwards
+# would walk into the same broken build again. So if the build fails, put
+# flake.lock back the way it was: you end up exactly where you started.
+nup() {    # update inputs + build + next boot
+  nixlog update sh -c '
+    cd ~/flakeos || exit 1
+
+    git diff --quiet flake.lock
+    lock_was_clean=$?
+
+    nix flake update || exit 1
+
+    if ! sudo nixos-rebuild boot --flake ~/flakeos; then
+      echo
+      if [ "$lock_was_clean" = 0 ]; then
+        echo "build failed - flake.lock put back, nothing changed"
+        git checkout flake.lock
+      else
+        echo "build failed - flake.lock already had changes before the update,"
+        echo "so it is left alone. git diff flake.lock shows all of them."
+      fi
+      exit 1
+    fi
+
+    echo
+    echo "what changes at the next boot:"
+    nix store diff-closures /run/current-system /nix/var/nix/profiles/system
+  '
 }
