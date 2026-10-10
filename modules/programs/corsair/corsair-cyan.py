@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Sets every LED on the Corsair Scimitar RGB Elite (1b1c:1be3) to one colour,
 once, and exits.
