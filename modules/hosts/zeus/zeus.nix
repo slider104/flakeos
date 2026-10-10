@@ -14,6 +14,7 @@
       gaming
       vm
       openrgb
+      corsair # the Scimitar's 12 side buttons
       rustdesk
       libreoffice
 
