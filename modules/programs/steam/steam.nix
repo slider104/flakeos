@@ -54,6 +54,25 @@
       enable = true;
       # Proton-GE shows up in Steam > game > Properties > Compatibility.
       extraCompatPackages = [pkgs.proton-ge-bin];
+
+      # Steam Input's keyboard/mouse emulation (trackpad set to "mouse", a
+      # button bound to a key) is written against the X11 XTEST extension, and
+      # Steam is an X11 client on xwayland-satellite here. XTEST events reach
+      # XWayland's own pointer and go no further: an X11 game feels an
+      # invisible mouse moving, niri's cursor never moves, and Wayland clients
+      # see nothing at all. The other half is missing too - niri 26.04 has no
+      # input emulation backend (no org.gnome.Mutter.RemoteDesktop on the bus),
+      # so the RemoteDesktop portal - the thing that pops up "allow this app to
+      # control your mouse?" on GNOME and KDE - has nobody to ask.
+      #
+      # extest is an LD_PRELOAD shim standing in for libXtst: Steam's XTEST
+      # calls become a real virtual input device through /dev/uinput, which
+      # niri picks up like any other mouse. slider is in `input`
+      # (users/slider.nix) and steam-hardware's udev rules give the seat user
+      # /dev/uinput. 64-bit Steam processes log "cannot preload" for the
+      # 32-bit library at startup - harmless, the client that sends XTEST is
+      # the 32-bit one.
+      extest.enable = true;
       remotePlay.openFirewall = true;
       localNetworkGameTransfers.openFirewall = true;
     };
