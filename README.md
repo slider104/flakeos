@@ -125,6 +125,32 @@ each other (up/down), each with its own strip.
 All binds live in `programs/niri/config.kdl` (section `binds`). Each has a
 `hotkey-overlay-title`, which is the text Mod+BackSpace shows.
 
+## Window rules
+
+Most windows tile, i.e. they open as a new column. niri opens a window
+*floating* (on top, freely movable) by itself if the program says it is a
+dialog or that it cannot be resized. Everything else is a **window rule** in
+`programs/niri/config.kdl` (section `window-rule`), like the one that makes
+the autoclicker float.
+
+- **Mod+A** makes the focused window floating or tiled again, just for now.
+  Mod+Ctrl+A jumps between the floating and the tiled windows.
+- A rule needs the window's *app ID*, which is rarely the program's name. Ask
+  niri while the window is open:
+  ```sh
+  niri msg windows
+  ```
+  It lists every open window with its app ID, title and whether it floats.
+  Copy the app ID into a rule:
+  ```kdl
+  window-rule {
+      match app-id=r#"^org\.flakeos\.Autoclicker$"#
+      open-floating true
+  }
+  ```
+  `open-floating false` does the opposite: it keeps a window tiled that niri
+  would have floated on its own.
+
 ## Terminal commands
 
 The shell is zsh. These aliases are defined in `programs/zsh/zshrc`:
@@ -185,7 +211,7 @@ menu, so a broken change is never a disaster (see
 |---|---|
 | keyboard layout | `system/locale.nix` (text console) **and** `programs/niri/config.kdl` (desktop, `layout "de"`) |
 | time zone, date / number formats | `system/locale.nix` |
-| key binds, gaps, window rules, mouse / touchpad | `programs/niri/config.kdl` |
+| key binds, gaps, window rules, mouse / touchpad | `programs/niri/config.kdl` - floating windows: [Window rules](#window-rules) |
 | colours, fonts, cursor, icons | `system/theme/palette.nix` |
 | bar, launcher, notifications, weather location | noctalia's settings panel + `noctalia-changes`, or `programs/noctalia/settings.json` |
 | terminal (see-through, font size) | `programs/alacritty/alacritty.toml` |
