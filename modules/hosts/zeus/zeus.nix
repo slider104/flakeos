@@ -6,18 +6,22 @@
   # zeus: gaming desktop.
   flake.nixosConfigurations.zeus = inputs.nixpkgs.lib.nixosSystem {
     modules = with self.nixosModules; [
-      zeus-hardware
+      # host hardware
       zeus-disko
+      zeus-hardware
 
+      # modules/programs
       base
       desktop
       gaming
       vm
-      openrgb
-      corsair # the Scimitar's 12 side buttons
-      rustdesk
-      libreoffice
 
+      corsair       # the Scimitar's 12 side buttons
+      libreoffice   # office suit
+      openrgb       # rgb settings for zeus
+      rustdesk      # remote desktop gui
+
+      # users
       slider
 
       {

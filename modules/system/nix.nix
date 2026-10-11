@@ -25,6 +25,6 @@
     nix.registry.nixpkgs.flake = inputs.nixpkgs;
     nix.nixPath = ["nixpkgs=${inputs.nixpkgs}"];
 
-    nixpkgs.config.allowUnfree = true; # Steam
+    nixpkgs.config.allowUnfree = true;
   };
 }

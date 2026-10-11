@@ -2,12 +2,12 @@
   # Gaming: Steam (+ Proton-GE), performance tools and other launchers.
   flake.nixosModules.gaming = {
     imports = with self.nixosModules; [
-      steam
       gamemode
       gamescope
+      lutris
       mangohud
       prismlauncher
-      lutris
+      steam
     ];
 
     # Split locks are slow memory operations some games (and Steam) do. By

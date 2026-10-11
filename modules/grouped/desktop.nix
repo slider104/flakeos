@@ -3,30 +3,29 @@
   flake.nixosModules.desktop = {
     imports = with self.nixosModules; [
       # system/
-      login
-      polkit
-      xdg
-      audio
-      dconf
-      fonts
-      theme
+      audio         # audio i guess
+      dconf         # defaults for apps with configs in dconf
+      fonts         # fonts i guess
+      login         # autologin
+      polkit        # sudo prompts for gui
+      theme         # system wide theme
+      xdg           # create home folders if missing
 
       # programs/
-      niri
-      noctalia
-      alacritty
-      firefox
-      brave # 2nd browser, for WebHID sites (iocenter.bequiet.com)
-      zed
-      nix-tools # nixd, nil, alejandra for the editors
-      claude-code
-      thunar
-      mpv
-      imv
-      shortwave
-      rnote
-      mediawriter
-      ydotool # autoclicker ("Autoclicker" in the launcher)
+      alacritty     # terminal emulator
+      brave         # internet browser
+      claude-code   # ai agent
+      firefox       # internet browser
+      imv           # pictures
+      mediawriter   # img writer
+      mpv           # video
+      niri          # window manager
+      noctalia      # top bar
+      rnote         # drawing board
+      shortwave     # internet radio
+      thunar        # file browser
+      ydotool       # autoclicker ("Autoclicker" in the launcher)
+      zed           # gui text editor
     ];
   };
 }

@@ -6,16 +6,20 @@
   # hermes: laptop.
   flake.nixosConfigurations.hermes = inputs.nixpkgs.lib.nixosSystem {
     modules = with self.nixosModules; [
-      hermes-hardware
+      # host hardware
       hermes-disko
+      hermes-hardware
 
+      # modules/programs
       base
-      desktop
       bluetooth
-      # gaming
-      rustdesk
-      libreoffice
+      desktop
 
+      # gaming
+      libreoffice
+      rustdesk
+
+      # users
       slider
 
       ({lib, ...}: {

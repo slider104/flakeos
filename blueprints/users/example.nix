@@ -8,12 +8,12 @@
       isNormalUser = true;
       description = "Example Person";
       extraGroups = [
-        # "wheel"          # uncomment to allow sudo
+        "audio"
+        "gamemode"
+        "input"
         "networkmanager"
         "video"
-        "audio"
-        "input"
-        "gamemode"
+        # "wheel"          # uncomment to allow sudo
       ];
       shell = config.programs.zsh.package; # the wrapped zsh
 

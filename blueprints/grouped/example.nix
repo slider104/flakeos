@@ -11,8 +11,7 @@
       audio
 
       # programs/
-      mpv
-      imv
+      brave
     ];
   };
 }

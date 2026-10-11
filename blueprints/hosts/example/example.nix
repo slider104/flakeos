@@ -12,8 +12,8 @@
   flake.nixosConfigurations.example = inputs.nixpkgs.lib.nixosSystem {
     modules = with self.nixosModules; [
       # This machine (hardware.nix + disko.nix next to this file).
-      example-hardware
       example-disko
+      example-hardware
 
       # Bundles from grouped/. Remove what the machine doesn't need.
       base
