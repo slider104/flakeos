@@ -160,14 +160,25 @@ The shell is zsh. These aliases are defined in `programs/zsh/zshrc`:
 | `nrs` | **rebuild** the system from `~/flakeos` and switch to it right away |
 | `nrb` | rebuild, but only switch at the next boot (for big changes, e.g. after an update) |
 | `nup` | **update**: fetch the newest versions of everything (`flake.lock`), build, use at the next boot. Build fails? `flake.lock` is put back |
+| `ndb` | **dry build**: check this machine's config for errors and list what a rebuild would build and download, without building it |
 | `nck` | check the config for errors without building anything |
 | `ncg` | delete old system versions (generations) older than 30 days, frees disk space |
 | `ll` | `ls -lah`: list all files with sizes |
 | `noctalia-changes` | show what you changed in noctalia's settings panel (see below) |
 | `dconf-changes` | show what you changed in a GTK app that saves its own settings (rnote, Shortwave, virt-manager) |
 
-- `nrs`, `nrb`, `nup` work the same on every machine: the flake picks the
-  config whose name matches the hostname (`zeus`, `hermes`).
+- `nrs`, `nrb`, `nup`, `ndb` work the same on every machine: the flake picks
+  the config whose name matches the hostname (`zeus`, `hermes`).
+- `ndb` before `nrs`/`nrb` when you changed a lot: it reads the whole config
+  for **this** machine and stops at the recipes instead of building them, so
+  it finds a typo or a wrong option name in seconds and needs no password.
+  It also prints what would be built and downloaded, which tells you how big
+  an update is before you start it. `nck` asks the wider question: it checks
+  **every** host and module in the flake, so it also catches breaking the
+  other machine. Use it before you push. Neither one can find errors that
+  only show up while a package is being built, so a rebuild can still fail
+  after a clean `ndb` or `nck` - it just fails while building, and the
+  running system stays untouched.
 - Each alias shows its output as usual **and** saves it to
   `~/flakeos/logs/<kind>_<date>.log` (e.g. `logs/rebuild_2026-09-12-14:03:22.log`).
   Handy when an error scrolled away. `logs/` is ignored by git; delete the

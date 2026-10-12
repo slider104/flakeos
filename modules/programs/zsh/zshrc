@@ -74,6 +74,7 @@ nixlog() {
 
 alias nrs='nixlog rebuild sudo nixos-rebuild switch --flake ~/flakeos'        # rebuild + switch now
 alias nrb='nixlog rebuild sudo nixos-rebuild boot --flake ~/flakeos'          # rebuild, use on next boot
+alias ndb='nixlog dry_build nixos-rebuild dry-build --flake ~/flakeos'        # evaluate this host, show what a rebuild would build
 alias nck='nixlog check_flake nix flake check ~/flakeos'                      # check the config
 alias ncg='nixlog garbage_collect sudo nix-collect-garbage --delete-older-than 30d'  # clean old generations
 
