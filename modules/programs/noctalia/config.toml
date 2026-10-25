@@ -19,13 +19,17 @@
 # adds new settings at the end of their section, and a comment sitting right
 # before the next section header would end up above them.
 #
-# ignore: wallpaper.default wallpaper.monitor
-#   Keys `noctalia-changes` never shows and never saves. The wallpaper you
-#   picked with Mod+W is remembered in layer 3 above - that is per machine,
-#   not configuration, and it would put a path in a public repo. Add more
-#   keys here (dotted, space separated) when something keeps showing up that
-#   you do not want in the repo. Deleting a key from this file is not enough:
-#   it is still in layer 3, so the next --save would write it back.
+# ignore: wallpaper.default wallpaper.last wallpaper.monitors wallpaper.favorite
+#   Keys `noctalia-changes` never shows and never saves. The four above are
+#   the wallpaper you picked with Mod+W (per screen, plus the last one and
+#   your favourites): noctalia only ever reads those from layer 3, so they
+#   cannot be set from this file anyway, and they would put machine-specific
+#   paths in a public repo. Add more keys here (dotted, space separated) when
+#   something keeps showing up that you do not want in the repo. Deleting a
+#   key from this file is not enough: it is still in layer 3, so the next
+#   --save would write it back.
+#   (This list is read from this file as it is on disk, so a change here
+#   works at once, without a rebuild.)
 
 [shell]
 corner_radius_scale = 0.2  # 0 = square corners, 1 = noctalia's default
