@@ -56,6 +56,31 @@
     # --- replacements: uncomment a line when a package on unstable is broken
     #
     # breakpad = final.stable.breakpad; # 2026-10-04: vtable link error, nixpkgs#569271
+
+    # 2026-10-25: nixpkgs *removed* `noctalia-shell`. Unstable now ships
+    # `noctalia` 5.x instead, which is not a new version but a rewrite: C++
+    # and meson rather than QuickShell and QML, the binary is called
+    # `noctalia`, its config is one TOML file (~/.config/noctalia/config.toml,
+    # found via NOCTALIA_CONFIG_HOME) instead of settings.json + colors.json,
+    # and keybinds call `noctalia msg ...` instead of
+    # `noctalia-shell ipc call ...`. nix-wrapper-modules has no module for it
+    # yet, so programs/noctalia/noctalia.nix cannot simply point at the new
+    # package - that is a migration, not an edit.
+    #
+    # So this line is different from the breakpad one above. That package was
+    # temporarily broken and the line could be deleted once unstable caught
+    # up. This one never will be: 4.x is gone and unmaintained. It holds the
+    # bar exactly as it is today and lets the rest of the system keep
+    # updating, until the migration to 5.x is done - then delete this line
+    # *and* rewrite the noctalia module in the same step.
+    #
+    # The cost here is the one the comment at the top of this file warns
+    # about: nothing else uses the stable nixpkgs, so this drags in stable's
+    # whole Qt and QuickShell stack next to unstable's - about 400 extra
+    # store paths. Pointing nixpkgs-stable at a recent unstable commit
+    # instead would make that nearly free, at the price of the input no
+    # longer meaning "the stable release".
+    noctalia-shell = final.stable.noctalia-shell;
   };
 
   flake.nixosModules.stable = {
