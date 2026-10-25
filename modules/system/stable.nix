@@ -74,12 +74,31 @@
     # updating, until the migration to 5.x is done - then delete this line
     # *and* rewrite the noctalia module in the same step.
     #
-    # The cost here is the one the comment at the top of this file warns
-    # about: nothing else uses the stable nixpkgs, so this drags in stable's
-    # whole Qt and QuickShell stack next to unstable's - about 400 extra
-    # store paths. Pointing nixpkgs-stable at a recent unstable commit
-    # instead would make that nearly free, at the price of the input no
-    # longer meaning "the stable release".
+    # This one also has to come from a *recent* commit, not the stable
+    # release, and that is why nixpkgs-stable points at a pinned unstable
+    # revision (see flake.nix). Taken from the release branch, noctalia
+    # starts, answers ipc and finds its wallpapers, but draws nothing at all:
+    # no bar, no wallpaper, no dock. Its QuickShell then logs
+    #
+    #   qt.qpa.wayland: EGL not available
+    #   Failed to create graphics context for ...WlrLayershell
+    #
+    # A borrowed package brings its own glibc, but not its own graphics
+    # driver: Mesa is dlopen'ed from /run/opengl-driver, which belongs to the
+    # system's nixpkgs, into the borrowed package's process. Unstable's Mesa
+    # needs GLIBC_2.44; the release branch was still on glibc 2.42, so the
+    # driver could not resolve its symbols, EGL stayed unavailable, and every
+    # layer-shell surface failed to get a context. Everything that is plain
+    # QML kept working, which is why it looked alive but invisible.
+    #
+    # The pin is 4.7.7, one patch newer than the release branch's 4.7.6, and
+    # shares its glibc, Qt and Mesa with the system instead of adding a
+    # second copy of that stack (~400 store paths).
+    #
+    # Note the pin is only safe while the system's Mesa needs nothing newer
+    # than the pin's glibc provides. The next glibc bump on unstable will
+    # break it again in exactly the same way - the fix then is to move the
+    # pin forward, or finally do the 5.x migration.
     noctalia-shell = final.stable.noctalia-shell;
   };
 
