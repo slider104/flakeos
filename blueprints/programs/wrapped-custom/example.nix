@@ -3,7 +3,8 @@
 in {
   # BLUEPRINT: a program wrapped by hand, for when there is NO ready-made module.
   # How to use it: blueprints/README.md
-  # Real one in this repo: programs/mangohud/.
+  # Real ones in this repo: programs/mangohud/ (two lines) and
+  # programs/noctalia/ (the same idea, with a settings file and its own option).
   #
   # First find out how the program can be told where its config is.
   # Look in `man example` or `example --help` for either:

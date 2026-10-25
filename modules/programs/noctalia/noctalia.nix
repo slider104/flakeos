@@ -2,188 +2,144 @@
   theme = config.theme;
   wrappers = config.flake.wrappers;
 in {
-  # noctalia-shell: bar, launcher, notifications, OSD, lock screen, wallpaper.
+  # noctalia: bar, launcher, notifications, OSD, lock screen, wallpaper.
   # Started by niri (`spawn-at-startup` in niri/config.kdl).
   #
-  # Declarative: settings.json (next to this file) + the palette are baked into
-  # the store. The settings GUI (Mod+Comma) still works for trying things out,
-  # but changes are gone after a restart. To keep something:
+  # This is noctalia 5, a rewrite of the 4.x shell this config used until
+  # 2026-10-25 (C++ instead of QuickShell/QML, one TOML file instead of
+  # settings.json + colors.json, `noctalia msg ...` instead of
+  # `noctalia-shell ipc call ...`). nix-wrapper-modules has no module for it,
+  # so this is a hand-written wrapper: package + the environment variable that
+  # points at our config (see blueprints/programs/wrapped-custom/).
+  #
+  # Declarative: config.toml (next to this file) plus fonts and colours from
+  # the palette, built into one config folder in the store. The settings GUI
+  # (Mod+Comma) stays fully usable: noctalia writes GUI changes to
+  # ~/.local/state/noctalia/settings.toml, which it reads *after* our file, so
+  # they win until you remove them. To keep something:
   #   1. change it in the GUI
   #   2. `noctalia-changes` shows what you changed
-  #   3. `noctalia-changes --save` adds that to settings.json; rebuild
-  # (see noctaliaChanges below, and the README)
-  #
-  # Only settings you set are here; everything else uses noctalia's defaults.
+  #   3. `noctalia-changes --save` writes it into config.toml; rebuild
+  #   4. `noctalia-changes --clear` drops the GUI copy
+  # (see noctalia-changes.py next to this file, and the README)
   #
   # Wallpapers: the images in flakeos/wallpapers/ (repo root) are installed to
-  # /etc/wallpapers. Mod+W picks one; it stays across logins. A random one on
-  # every login is possible too (commented out in prepareStart). To add one,
-  # drop the file in, `git add` it, rebuild.
-  flake.wrappers.noctalia-shell = {
+  # /etc/wallpapers. Mod+W picks one; noctalia remembers it in its state file,
+  # so it stays across logins. To add one, drop the file in, `git add` it,
+  # rebuild.
+  #
+  # Three things the 4.x module needed and this one doesn't:
+  #   - a script that wrote ~/.cache/noctalia/shell-state.json before every
+  #     start, to skip the telemetry question and the changelog. 5 has no
+  #     changelog popup, and `setup_wizard_enabled = false` in config.toml
+  #     covers the first-run wizard.
+  #   - a QML patch that recoloured the system monitor's numbers. There is no
+  #     QML left to patch; widget colours are plain settings now.
+  #   - a snapshot hook for `noctalia-changes`. GUI changes land in their own
+  #     file, so there is nothing to compare against any more.
+  flake.wrappers.noctalia = {
     wlib,
     lib,
     pkgs,
+    config,
     ...
   }: let
-    # Runs before noctalia starts. It writes two files in ~/.cache/noctalia
-    # (the only place noctalia keeps state; its config is in the store):
-    #
-    #   shell-state.json - noctalia shows a telemetry question and then the
-    #     changelog when this file has no "last seen version". Filling it in
-    #     on first start skips both. After that, showChangelogOnStartup =
-    #     false in settings.json keeps the changelog away after updates.
-    #     (The first-run setup wizard never shows: it only opens when
-    #     settings.json is missing, and ours is in the store.)
-    #
-    #   wallpapers.json - noctalia's remembered wallpaper. Can be overwritten
-    #     on every start with a random image from /etc/wallpapers (commented
-    #     out below).
-    #
-    # The same `noctalia-shell` command is used for keybinds
-    # (`noctalia-shell ipc call ...`); those have arguments and are skipped.
-    prepareStart = pkgs.writeShellScript "noctalia-prepare-start" ''
-      [ $# -eq 0 ] || exit 0 # an ipc call, not a start
+    toml = pkgs.formats.toml {};
+    json = pkgs.formats.json {};
 
-      cache="''${XDG_CACHE_HOME:-$HOME/.cache}/noctalia"
-      mkdir -p "$cache"
+    # The launcher button's icon, the NixOS logo (noctalia 4 found it through
+    # the icon theme; 5 wants a path).
+    nixLogo = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
 
-      if [ ! -e "$cache/shell-state.json" ]; then
-        echo '{"changelogState": {"lastSeenVersion": "v${pkgs.noctalia-shell.version}"}}' \
-          > "$cache/shell-state.json"
-      fi
+    # Noctalia's 16 colour roles, filled from the palette, in the format it
+    # calls a palette file. `dark` is used for both modes; we only run dark.
+    # The terminal block is only read by noctalia's theme templates (off in
+    # config.toml), but it belongs to a complete palette, so it is here.
+    palette = json.generate "flakeos.json" {
+      dark = {
+        mPrimary = theme.accent;
+        mOnPrimary = theme.onAccent;
+        mSecondary = theme.bright.blue;
+        mOnSecondary = theme.bg; # dark text on the light blue
+        mTertiary = theme.bright.cyan;
+        mOnTertiary = theme.bg; # dark text on the light cyan
+        mError = theme.error;
+        mOnError = theme.onAccent;
+        mSurface = theme.bg;
+        mOnSurface = theme.text;
+        mSurfaceVariant = theme.surface;
+        mOnSurfaceVariant = theme.muted;
+        mOutline = theme.border;
+        mShadow = "#000000";
+        mHover = theme.overlay;
+        mOnHover = theme.text;
+        terminal = {
+          background = theme.bg;
+          foreground = theme.text;
+          cursor = theme.text;
+          cursorText = theme.bg;
+          selectionBg = theme.accent;
+          selectionFg = theme.onAccent;
+          inherit (theme) normal bright;
+        };
+      };
+    };
 
-      # Random wallpaper on every login.
-      # Uncomment to turn it back on.
-      # shopt -s nullglob
-      # walls=(/etc/wallpapers/*)
-      # if [ ''${#walls[@]} -gt 0 ]; then
-      #   pick=''${walls[RANDOM % ''${#walls[@]}]}
-      #   echo "{\"defaultWallpaper\": \"$pick\"}" > "$cache/wallpapers.json"
-      # fi
+    # The folder noctalia reads: config.toml plus the palette next to it.
+    # NOCTALIA_CONFIG_HOME works like XDG_CONFIG_HOME, so it points at the
+    # folder *above* the "noctalia" one.
+    #
+    # `config validate` checks the generated file the way the running shell
+    # reads it. An unknown or misspelled setting is a warning (noctalia
+    # ignores it and says so), a broken value is an error and fails the
+    # rebuild here instead of leaving you with a bar that won't start.
+    configHome = pkgs.runCommand "noctalia-config" {} ''
+      install -Dm444 ${toml.generate "config.toml" config.settings} \
+        $out/noctalia/config.toml
+      install -Dm444 ${palette} $out/noctalia/palettes/flakeos.json
+      ${lib.getExe config.package} config validate $out/noctalia
     '';
   in {
-    imports = [wlib.wrapperModules.noctalia-shell];
+    imports = [wlib.modules.default];
 
-    runShell = [''${prepareStart} "$@"''];
+    # Our own option, so a host can change single settings - see
+    # hosts/hermes/hermes.nix, which replaces the bar's right-hand widgets.
+    options.settings = lib.mkOption {
+      type = lib.types.attrsOf lib.types.anything;
+      default = {};
+      description = "Contents of noctalia's config.toml.";
+    };
 
-    # System monitor panel (click the bar's system monitor): the numbers above
-    # the graphs (CPU %, temperature, memory, network speed) are drawn in the
-    # accent blues, hard to read on the dark card. No setting for it, so patch
-    # them to the normal text colour. Icons and graph lines keep their colours.
-    # --replace-fail: if an update changes that file, the build stops here
-    # instead of silently dropping the fix.
-    package = pkgs.noctalia-shell.overrideAttrs (old: {
-      postPatch =
-        (old.postPatch or "")
-        + ''
-          substituteInPlace Modules/Panels/SystemStats/SystemStatsPanel.qml \
-            --replace-fail \
-              $'color: Color.mPrimary\n              font.family: Settings.data.ui.fontFixed' \
-              $'color: Color.mOnSurface\n              font.family: Settings.data.ui.fontFixed' \
-            --replace-fail \
-              $'color: Color.mSecondary\n              font.family: Settings.data.ui.fontFixed' \
-              $'color: Color.mOnSurface\n              font.family: Settings.data.ui.fontFixed'
-        '';
-    });
+    config = {
+      package = pkgs.noctalia;
+      env.NOCTALIA_CONFIG_HOME = "${configHome}";
 
-    settings = lib.importJSON ./settings.json;
+      settings = lib.mkMerge [
+        (lib.importTOML ./config.toml)
 
-    # Noctalia's colour roles, filled from the palette.
-    colors = {
-      mPrimary = theme.accent;
-      mOnPrimary = theme.onAccent;
-      mSecondary = theme.bright.blue;
-      mOnSecondary = theme.bg; # dark text on the light blue
-      mTertiary = theme.bright.cyan;
-      mOnTertiary = theme.bg; # dark text on the light cyan
-      mError = theme.error;
-      mOnError = theme.onAccent;
-      mSurface = theme.bg;
-      mOnSurface = theme.text;
-      mSurfaceVariant = theme.surface;
-      mOnSurfaceVariant = theme.muted;
-      mOutline = theme.border;
-      mShadow = "#000000";
-      mHover = theme.overlay;
-      mOnHover = theme.text;
+        # From the palette, so there is one place for fonts and colours.
+        {
+          shell.font_family = theme.font.sans;
+          widget.launcher.custom_image = nixLogo;
+          widget.cpu.font_family = theme.font.mono;
+          widget."cpu-temp".font_family = theme.font.mono;
+          widget.ram.font_family = theme.font.mono;
+        }
+      ];
     };
   };
 
   flake.nixosModules.noctalia = {pkgs, ...}: let
-    # `noctalia-changes [--save]`: what you changed in the settings GUI.
-    #
-    # When noctalia starts, its startup hook (settings.json → "hooks") runs
-    # `noctalia-changes --snapshot`, which saves noctalia's settings as they
-    # are then. Later, `noctalia-changes` compares the live settings with
-    # that snapshot and prints only what differs, as JSON in the shape of
-    # settings.json. (Comparing with settings.json itself doesn't work:
-    # noctalia fills in lots of defaults, e.g. every option of every bar
-    # widget, which would all show up as "changed".)
-    #
-    # --save merges the changes into ~/flakeos/.../settings.json and takes a
-    # new snapshot, so the next run only shows newer changes.
-    noctaliaChanges = pkgs.writeShellApplication {
-      name = "noctalia-changes";
-      runtimeInputs = [pkgs.jq]; # noctalia-shell itself comes from PATH
-      text = ''
-        snapshot="''${XDG_CACHE_HOME:-$HOME/.cache}/noctalia/settings-at-start.json"
-        repo="$HOME/flakeos/modules/programs/noctalia/settings.json"
-
-        live() { noctalia-shell ipc call state all | jq '.settings'; }
-
-        case "''${1:-}" in
-          --snapshot)
-            sleep 5 # noctalia fills in the widget defaults a moment after start
-            live > "$snapshot"
-            exit 0
-            ;;
-          "" | --save) ;;
-          *)
-            echo "usage: noctalia-changes [--save]" >&2
-            exit 1
-            ;;
-        esac
-
-        if [ ! -s "$snapshot" ]; then
-          echo "No snapshot yet. Noctalia takes one when it starts: log out and in again." >&2
-          exit 1
-        fi
-
-        # changed(new; old): only the parts of new that differ from old.
-        # Objects are compared key by key; anything else (numbers, text,
-        # lists like the bar widgets) is kept whole when it differs.
-        changes=$(live | jq --slurpfile old "$snapshot" '
-          def changed($new; $old):
-            if ($new | type) == "object" and ($old | type) == "object" then
-              reduce ($new | keys_unsorted[]) as $k ({};
-                changed($new[$k]; $old[$k]) as $c
-                | if $c == null then . else .[$k] = $c end)
-              | if . == {} then null else . end
-            elif $new == $old then null
-            else $new
-            end;
-          changed(.; $old[0]) // {}')
-
-        if [ "$changes" = "{}" ]; then
-          echo "Nothing changed in the settings GUI (since noctalia started or the last --save)."
-          exit 0
-        fi
-
-        echo "$changes"
-
-        if [ "''${1:-}" = --save ]; then
-          merged=$(jq --argjson changes "$changes" '. * $changes' "$repo")
-          printf '%s\n' "$merged" > "$repo"
-          live > "$snapshot"
-          echo
-          echo "Added to $repo."
-          echo "Check it with 'git diff', then rebuild (nrs)."
-        fi
-      '';
-    };
+    # `noctalia-changes [--save|--clear]`: what you changed in the settings
+    # GUI. The script explains itself; tomlkit is what lets --save write into
+    # config.toml without throwing its comments away.
+    noctaliaChanges = pkgs.writers.writePython3Bin "noctalia-changes" {
+      libraries = [pkgs.python3Packages.tomlkit];
+      flakeIgnore = ["E501"]; # long lines in the help text
+    } (builtins.readFile ./noctalia-changes.py);
   in {
-    imports = [wrappers.noctalia-shell.install];
-    wrappers.noctalia-shell.enable = true;
+    imports = [wrappers.noctalia.install];
+    wrappers.noctalia.enable = true;
 
     # A fixed path (not a /nix/store path that changes with every new image),
     # so the remembered wallpaper stays valid across rebuilds.
@@ -198,5 +154,14 @@ in {
       pkgs.brightnessctl # brightness OSD / keys
       noctaliaChanges
     ];
+
+    # A fixed path to tomlkit, so Zed's Python checker (basedpyright) finds
+    # the import while you edit noctalia-changes.py. Without it, Zed marks
+    # `import tomlkit` as an error (the script itself works either way: the
+    # package above brings its own copy). pyrightconfig.json in the repo root
+    # points here. Same idea as /etc/autoclicker/python in programs/ydotool/,
+    # but tomlkit is pure Python with no dependencies, so the library folder
+    # itself is enough.
+    environment.etc."noctalia-changes/python-libs".source = "${pkgs.python3Packages.tomlkit}/${pkgs.python3.sitePackages}";
   };
 }

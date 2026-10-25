@@ -42,7 +42,7 @@ modules/
 │   └── theme/            palette.nix (THE colours) + theme.nix (GTK/Qt/cursor/TTY)
 ├── programs/             one folder per program: <name>.nix + its native config file(s)
 │   ├── niri/             niri.nix + config.kdl
-│   ├── noctalia/         noctalia.nix + settings.json
+│   ├── noctalia/         noctalia.nix + config.toml
 │   ├── alacritty/        alacritty.nix + alacritty.toml
 │   ├── zsh/              zsh.nix + zshrc
 │   ├── zed/              zed.nix (+ palette theme) + settings.json
@@ -164,7 +164,7 @@ The shell is zsh. These aliases are defined in `programs/zsh/zshrc`:
 | `nck` | check the config for errors without building anything |
 | `ncg` | delete old system versions (generations) older than 30 days, frees disk space |
 | `ll` | `ls -lah`: list all files with sizes |
-| `noctalia-changes` | show what you changed in noctalia's settings panel (see below) |
+| `noctalia-changes` | show what you changed in noctalia's settings window (see below) |
 | `dconf-changes` | show what you changed in a GTK app that saves its own settings (rnote, Shortwave, virt-manager) |
 
 - `nrs`, `nrb`, `nup`, `ndb` work the same on every machine: the flake picks
@@ -224,7 +224,7 @@ menu, so a broken change is never a disaster (see
 | time zone, date / number formats | `system/locale.nix` |
 | key binds, gaps, window rules, mouse / touchpad | `programs/niri/config.kdl` - floating windows: [Window rules](#window-rules) |
 | colours, fonts, cursor, icons | `system/theme/palette.nix` |
-| bar, launcher, notifications, weather location | noctalia's settings panel + `noctalia-changes`, or `programs/noctalia/settings.json` |
+| bar, launcher, notifications, weather location | noctalia's settings window + `noctalia-changes`, or `programs/noctalia/config.toml` |
 | terminal (see-through, font size) | `programs/alacritty/alacritty.toml` |
 | aliases, prompt, shell history | `programs/zsh/zshrc` |
 | git name and e-mail | `programs/git/gitconfig` |
@@ -253,9 +253,10 @@ niri, noctalia, alacritty, zsh, git, btop, mpv, imv, mangohud and bat are
 *wrapped*: their config is baked into the program at rebuild.
 
 - Config changes need a **rebuild**. Editing `~/.config/…` does nothing.
-- Settings changed *inside* a wrapped program (btop options, noctalia's
-  settings panel) don't survive a restart. For noctalia there's a command
-  that makes them permanent, see
+- Settings changed *inside* a wrapped program (btop options) don't survive a
+  restart. noctalia is the exception: it writes what you change in its
+  settings window to a file of its own and keeps it, but that file is not in
+  the repo, so a command copies it in - see
   [Keeping noctalia settings](#keeping-noctalia-settings).
 - `git config --global` can't write; edit `programs/git/gitconfig`.
 - **Zed** can't be pointed at a config file, so its wrapper links two files
@@ -321,6 +322,13 @@ so, in one of two ways:
 Write next to the line what broke, and delete it again once unstable is
 fixed. The file itself explains both ways and what they cost.
 
+One warning for programs that draw on screen: a borrowed package brings its
+own libraries, but the graphics driver always comes from the running system.
+If the two nixpkgs are far apart, the driver can't load into that program and
+it starts up showing nothing at all. For those, point `nixpkgs-stable` in
+`flake.nix` at an unstable commit from just before the breakage instead of at
+the release branch. `system/stable.nix` has the full story.
+
 ## Default apps
 
 Which program opens which file type is set in each program's own module
@@ -344,10 +352,16 @@ xdg-mime query default image/png
 
 ## Wallpapers
 
-Mod+W picks a picture from `wallpapers/` (repo root); it stays across
-logins. Want a random one on every login instead? That's already there,
-just commented out: uncomment the block in `prepareStart` in
-`programs/noctalia/noctalia.nix` and rebuild.
+Mod+W picks a picture from `wallpapers/` (repo root); it stays across logins
+(noctalia remembers it). Want it to change by itself instead? Add a
+`[wallpaper.automation]` section to `programs/noctalia/config.toml`:
+
+```toml
+[wallpaper.automation]
+enabled = true
+interval_seconds = 1800
+order = "random"
+```
 
 - Put the picture into `~/flakeos/wallpapers/`, then:
   ```sh
@@ -363,22 +377,25 @@ just commented out: uncomment the block in `prepareStart` in
 
 ## Keeping noctalia settings
 
-**How it works:** noctalia's real settings are
-`programs/noctalia/settings.json`, baked in at rebuild. The settings panel
-(Mod+Comma) is great for trying things out, but its changes are gone after
-the next login. When noctalia starts, it takes a snapshot of its settings
-(`~/.cache/noctalia/settings-at-start.json`, via the startup hook in
-`settings.json`), and `noctalia-changes` compares the live settings against
-that snapshot. So it shows **only what you changed** (e.g.
-`"bar": {"displayMode": "auto_hide"}`), not noctalia's hundreds of other
-settings.
+**How it works:** noctalia reads its settings from two files, in this order:
 
-- Change things in the panel (Mod+Comma) until you like them.
+1. `programs/noctalia/config.toml` - ours, baked into the store at rebuild
+2. `~/.local/state/noctalia/settings.toml` - written by noctalia itself
+   whenever you change something in its settings window (Mod+Comma)
+
+The second one wins. That is deliberate on noctalia's side: it means the
+settings window keeps working even though our file is read-only in the
+store. It also means that file *is* the list of your own changes - so
+`noctalia-changes` simply shows it, and `--save` copies it into
+`config.toml`, comments and all.
+
+- Change things in the settings window (Mod+Comma) until you like them. They
+  take effect at once and stay, also after a reboot.
 - Show what you changed:
   ```sh
   noctalia-changes
   ```
-- Add it to `programs/noctalia/settings.json`:
+- Write it into `programs/noctalia/config.toml`:
   ```sh
   noctalia-changes --save
   ```
@@ -387,26 +404,50 @@ settings.
   cd ~/flakeos
   ```
   ```sh
-  git diff
+  git add -A
   ```
-- Rebuild; now it's permanent:
+  ```sh
+  git diff HEAD
+  ```
+- Rebuild, so the repo is what runs:
   ```sh
   nrs
   ```
+- Drop noctalia's copy, now that the same settings come from the repo:
+  ```sh
+  noctalia-changes --clear
+  ```
+
+**That last step matters.** Skip it and the setting sits in both files with
+the same value - which looks fine, until you change it in `config.toml` one
+day and nothing happens, because noctalia's own file still wins. (The same
+trap as `dconf reset` below.) `--clear` keeps a copy next to the file
+(`settings.toml.bak`), and noctalia notices within a second: it falls back to
+the config from the last rebuild, so nothing on screen changes.
 
 Good to know:
 - Don't want everything it found? Run `noctalia-changes` without `--save`
-  and copy just the parts you want into `settings.json` by hand. Or save,
-  then undo parts in Zed's git panel.
-- "No snapshot yet": noctalia was started before the snapshot existed. Log
-  out and back in once.
-- After `--save`, running it again shows only newer changes. A change to a
-  bar widget saves that whole section's widget list (left, center or right),
-  so that part of `settings.json` gets long; that's normal.
-- Colours are not in the panel's settings: they come from the palette
-  (`system/theme/palette.nix`).
-- The wallpaper you pick with Mod+W isn't a setting (see
-  [Wallpapers](#wallpapers)).
+  and copy just the parts you want into `config.toml` by hand. Or save, then
+  undo parts in Zed's git panel.
+- Something that keeps showing up and should never be in the repo (the
+  wallpaper you picked, for example) goes on an `# ignore:` line in
+  `config.toml`. Deleting the line from `config.toml` is not enough - it is
+  still in noctalia's file, so the next `--save` writes it back.
+- New settings are added at the end of their section; move them if it reads
+  better.
+- Colours and fonts are not in the settings window: they come from the
+  palette (`system/theme/palette.nix`).
+- A change to a bar lane saves that whole lane (`start`, `center` or `end`),
+  because a list can only be replaced as a whole; that's normal.
+- The rebuild is what makes the new `config.toml` reach noctalia, but the
+  running shell keeps the old one until it restarts. To see repo-side changes
+  without logging out:
+  ```sh
+  pkill -x noctalia
+  ```
+  ```sh
+  niri msg action spawn -- noctalia
+  ```
 
 ## Keeping GTK app settings (dconf)
 

@@ -10,7 +10,7 @@
 // ----------------------------------------------------------------------------
 
 // Bar, launcher, notifications, wallpaper, lock screen, OSD.
-spawn-at-startup "noctalia-shell"
+spawn-at-startup "noctalia"
 
 // Keeps the clipboard of X11 programs and of niri the same (programs/niri).
 spawn-at-startup "niri-clipboard-bridge"
@@ -117,6 +117,16 @@ window-rule {
     default-column-width { proportion 1.0; }
 }
 
+// Noctalia's settings window (Mod+Comma). In noctalia 4 it was drawn on top
+// of everything as a layer; in 5 it is an ordinary window, so niri would
+// tile it into a column.
+window-rule {
+    match app-id=r#"^dev\.noctalia\.Noctalia$"#
+    open-floating true
+    default-column-width { fixed 1080; }
+    default-window-height { fixed 920; }
+}
+
 // Autoclicker window (programs/ydotool): floating instead of a column.
 window-rule {
     match app-id=r#"^org\.flakeos\.Autoclicker$"#
@@ -138,9 +148,9 @@ binds {
     Mod+BackSpace                   hotkey-overlay-title="Hotkeys" { show-hotkey-overlay; }
 
     // System (noctalia).
-    Mod+Alt+L                       repeat=false hotkey-overlay-title="Session menu (lock, suspend, power off)" { spawn "noctalia-shell" "ipc" "call" "sessionMenu" "toggle"; }
-    Mod+Comma                       repeat=false hotkey-overlay-title="Noctalia settings" { spawn "noctalia-shell" "ipc" "call" "settings" "toggle"; }
-    Mod+W                           repeat=false hotkey-overlay-title="Pick wallpaper" { spawn "noctalia-shell" "ipc" "call" "wallpaper" "toggle"; }
+    Mod+Alt+L                       repeat=false hotkey-overlay-title="Session menu (lock, suspend, power off)" { spawn "noctalia" "msg" "panel-toggle" "session"; }
+    Mod+Comma                       repeat=false hotkey-overlay-title="Noctalia settings" { spawn "noctalia" "msg" "settings-toggle"; }
+    Mod+W                           repeat=false hotkey-overlay-title="Pick wallpaper" { spawn "noctalia" "msg" "panel-toggle" "wallpaper"; }
     Mod+Shift+Alt+L                 repeat=false hotkey-overlay-title="Power off monitors" { power-off-monitors; }
     Mod+Ctrl+Shift+Q                hotkey-overlay-title="Exit niri session" { quit; }
 
@@ -149,13 +159,15 @@ binds {
     Mod+Ctrl+S                      repeat=false hotkey-overlay-title="Screenshot (monitor: focused)" { screenshot-screen; }
     Mod+Shift+S                     repeat=false hotkey-overlay-title="Screenshot (select region)" { screenshot; }
 
-    // Notifications (noctalia).
-    Mod+N                           repeat=false hotkey-overlay-title="Notification history" { spawn "noctalia-shell" "ipc" "call" "notifications" "toggleHistory"; }
-    Mod+Shift+N                     repeat=false hotkey-overlay-title="Dismiss oldest notification" { spawn "noctalia-shell" "ipc" "call" "notifications" "dismissOldest"; }
-    Mod+Ctrl+N                      repeat=false hotkey-overlay-title="Dismiss all notifications" { spawn "noctalia-shell" "ipc" "call" "notifications" "dismissAll"; }
+    // Notifications (noctalia). History lives in the control center now;
+    // "dismiss the oldest one" is gone, so Mod+Shift+N clears the popups
+    // still on screen and Mod+Ctrl+N empties the history.
+    Mod+N                           repeat=false hotkey-overlay-title="Notification history" { spawn "noctalia" "msg" "panel-toggle" "control-center" "notifications"; }
+    Mod+Shift+N                     repeat=false hotkey-overlay-title="Dismiss visible notifications" { spawn "noctalia" "msg" "notification-clear-active"; }
+    Mod+Ctrl+N                      repeat=false hotkey-overlay-title="Clear notification history" { spawn "noctalia" "msg" "notification-clear-history"; }
 
     // Launcher (noctalia).
-    Mod+Space                       repeat=false hotkey-overlay-title="Launcher" { spawn "noctalia-shell" "ipc" "call" "launcher" "toggle"; }
+    Mod+Space                       repeat=false hotkey-overlay-title="Launcher" { spawn "noctalia" "msg" "panel-toggle" "launcher"; }
 
     // Apps.
     Mod+Return                      repeat=false hotkey-overlay-title="Terminal" { spawn "alacritty"; }
@@ -285,8 +297,8 @@ binds {
     Shift+XF86AudioPrev             allow-when-locked=true hotkey-overlay-title="Seek -10 seconds" { spawn "playerctl" "position" "10-"; }
     Shift+XF86AudioNext             allow-when-locked=true hotkey-overlay-title="Seek +10 seconds" { spawn "playerctl" "position" "10+"; }
 
-    XF86MonBrightnessUp             allow-when-locked=true hotkey-overlay-title="Increase brightness" { spawn "noctalia-shell" "ipc" "call" "brightness" "increase"; }
-    XF86MonBrightnessDown           allow-when-locked=true hotkey-overlay-title="Decrease brightness" { spawn "noctalia-shell" "ipc" "call" "brightness" "decrease"; }
+    XF86MonBrightnessUp             allow-when-locked=true hotkey-overlay-title="Increase brightness" { spawn "noctalia" "msg" "brightness-up"; }
+    XF86MonBrightnessDown           allow-when-locked=true hotkey-overlay-title="Decrease brightness" { spawn "noctalia" "msg" "brightness-down"; }
 
     // Escape hatch: if an app grabs the keyboard shortcuts, this always works.
     Mod+Escape                      allow-inhibiting=false hotkey-overlay-title="Toggle shortcut inhibitor" { toggle-keyboard-shortcuts-inhibit; }

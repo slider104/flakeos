@@ -495,7 +495,7 @@ don't break anything, but you'll want your own. From now on you edit in
   |---|---|
   | `programs/git/gitconfig` | `name` and `email` under `[user]`: they go into every git commit you make |
   | `programs/zed/settings.json` | in the `lsp` part: `/home/slider/flakeos` → `/home/<you>/flakeos`, and `nixosConfigurations.zeus` → your hostname. Then Zed can complete NixOS options |
-  | `programs/noctalia/settings.json` | `"location"` → `"name"`: your city (weather in the bar) |
+  | `programs/noctalia/config.toml` | `[location]` → `address`: your city (weather in the control center) |
   | `system/locale.nix` | the `LC_…` formats, e.g. `de_DE.UTF-8` → `en_GB.UTF-8` or `en_US.UTF-8` |
   | `programs/niri/config.kdl` | only if the desktop keyboard is still wrong: `layout "de"` (UK: `"gb"`) |
 

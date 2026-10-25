@@ -48,7 +48,7 @@
       ...
     }: {
       # The pkgs the flake's *own* outputs are built from: the wrappers as
-      # packages (`nix build .#noctalia-shell`, `nix run .#zsh`) and the
+      # packages (`nix build .#noctalia`, `nix run .#zsh`) and the
       # formatter. A host does not use this one - it gets its own pkgs from
       # its nixosSystem - so without saying it twice the two would differ.
       # Both lines below mirror what the hosts have, so a package built by

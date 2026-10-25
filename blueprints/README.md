@@ -229,8 +229,8 @@ How the programs in this repo were decided:
 
 | way | programs | why |
 |---|---|---|
-| B. wrapped, ready-made | niri, noctalia, alacritty, zsh, git, btop, mpv, imv | config lives here, module exists |
-| C. wrapped by hand | mangohud, bat | no module, but an environment variable for the config |
+| B. wrapped, ready-made | niri, alacritty, zsh, git, btop, mpv, imv | config lives here, module exists |
+| C. wrapped by hand | noctalia, mangohud, bat | no module, but an environment variable for the config |
 | C. special case | Zed | can't be pointed at a file, so its wrapper links files into `~/.config/zed` before every start |
 | A. plain, NixOS module | Firefox | nixpkgs itself builds a wrapped Firefox from `policies` |
 | A. plain | Steam, Lutris, Prism Launcher | they keep their own state (library, accounts) |

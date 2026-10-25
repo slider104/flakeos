@@ -7,7 +7,7 @@ in {
   #
   # Is there a ready-made module for your program? Check the list:
   #   https://nix-community.github.io/nix-wrapper-modules/
-  # (in this repo: alacritty, niri, noctalia-shell, zsh, git, btop, mpv, imv)
+  # (in this repo: alacritty, niri, zsh, git, btop, mpv, imv)
   # If not, use blueprints/programs/wrapped-custom/ instead.
   flake.wrappers.example = {wlib, ...}: {
     imports = [wlib.wrapperModules.example];
