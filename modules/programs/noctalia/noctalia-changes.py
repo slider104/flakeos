@@ -108,7 +108,11 @@ def main() -> int:
         overrides.unlink()
         print(f"Removed {overrides} (a copy is in {backup.name}).")
         print("Noctalia notices within a second and falls back to the "
-              "config.toml from the last rebuild.")
+              "config.toml it was *started* with - not necessarily the one "
+              "from the last rebuild, because NOCTALIA_CONFIG_HOME is a "
+              "store path fixed in its environment at start. To pick up a "
+              "rebuilt config.toml, restart it:")
+        print("  pkill -x noctalia && noctalia -d")
         return 0
 
     repo_text = REPO_CONFIG.read_text()

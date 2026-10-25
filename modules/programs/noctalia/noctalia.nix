@@ -21,7 +21,14 @@ in {
   #   2. `noctalia-changes` shows what you changed
   #   3. `noctalia-changes --save` writes it into config.toml; rebuild
   #   4. `noctalia-changes --clear` drops the GUI copy
+  #   5. `pkill -x noctalia && noctalia -d` restarts the shell
   # (see noctalia-changes.py next to this file, and the README)
+  #
+  # Step 5 is not optional: a rebuild does not reach the running noctalia.
+  # NOCTALIA_CONFIG_HOME is a store path fixed in its environment when the
+  # process starts, so a changed config.toml is a *new* path that only a new
+  # process sees - `msg config-reload` re-reads the old one. niri spawns
+  # noctalia at session start only, hence starting it by hand.
   #
   # Wallpapers: the images in flakeos/wallpapers/ (repo root) are installed to
   # /etc/wallpapers. Mod+W picks one; noctalia remembers it in its state file,
