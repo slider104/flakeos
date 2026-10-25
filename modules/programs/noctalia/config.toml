@@ -48,7 +48,6 @@
 corner_radius_scale = 0.2  # 0 = square corners, 1 = noctalia's default
 telemetry_enabled = false  # no startup ping (also noctalia's default)
 setup_wizard_enabled = false  # the config is here; never ask on first start
-polkit_agent = true  # noctalia asks for passwords instead of a separate agent
 
 [shell.animation]
 speed = 2.0  # 2x faster than default
