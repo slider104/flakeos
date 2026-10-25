@@ -21,7 +21,9 @@ in {
   #   2. `noctalia-changes` shows what you changed
   #   3. `noctalia-changes --save` writes it into config.toml; rebuild
   #   4. `noctalia-changes --clear` drops the GUI copy
-  #   5. `pkill -x noctalia && noctalia -d` restarts the shell
+  #   5. `pkill -f 'bin/noctalia$' && noctalia -d` restarts the shell
+  #      (`pkill -x noctalia` finds nothing: the wrapper execs a binary
+  #      called .noctalia-wrapped, so that is the process name)
   # (see noctalia-changes.py next to this file, and the README)
   #
   # Step 5 is not optional: a rebuild does not reach the running noctalia.

@@ -112,7 +112,7 @@ def main() -> int:
               "from the last rebuild, because NOCTALIA_CONFIG_HOME is a "
               "store path fixed in its environment at start. To pick up a "
               "rebuilt config.toml, restart it:")
-        print("  pkill -x noctalia && noctalia -d")
+        print("  pkill -f 'bin/noctalia$' && noctalia -d")
         return 0
 
     repo_text = REPO_CONFIG.read_text()
