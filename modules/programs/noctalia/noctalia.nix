@@ -102,8 +102,10 @@ in {
   in {
     imports = [wlib.modules.default];
 
-    # Our own option, so a host can change single settings - see
-    # hosts/hermes/hermes.nix, which replaces the bar's right-hand widgets.
+    # Our own option, so config.toml and the palette values below merge into
+    # one attrset - and so a host can still override single settings with
+    # `wrappers.noctalia.settings.<path>` instead of copying the whole file.
+    # No host does at the moment; both bars are the shared one.
     options.settings = lib.mkOption {
       type = lib.types.attrsOf lib.types.anything;
       default = {};

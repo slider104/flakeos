@@ -720,7 +720,7 @@ folder name, the `nixosConfigurations.<name>` and `networking.hostName` must
 all be the same.
 
 **Real ones:** `hosts/zeus/` (desktop: gaming, OpenRGB, a second drive) and
-`hosts/hermes/` (laptop: Bluetooth, battery in the bar).
+`hosts/hermes/` (laptop: Bluetooth off at boot).
 
 A new machine has to be installed anyway, and the
 [installation guide](../modules/setup/README.md) creates the host on the
@@ -730,7 +730,8 @@ disk. After the install:
 - Commit and push the new folder, so your other machines know it (see
   "Saving changes to GitHub" in the [main README](../README.md)).
 - A laptop? Add `bluetooth` to the host's list, and look at
-  `hosts/hermes/hermes.nix` for the battery and brightness widgets in the bar.
+  `hosts/hermes/hermes.nix`, which also leaves Bluetooth switched off at boot
+  to save battery.
 - `system.stateVersion` stays as it was at install time. Never change it,
   also not after updates: it only tells NixOS how old the machine's data is.
 

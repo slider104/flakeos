@@ -11,6 +11,13 @@
 # Only settings that differ from noctalia's own defaults are here. The full
 # list with every default: `noctalia config export full`, or example.toml in
 # https://github.com/noctalia-dev/noctalia. Docs: https://docs.noctalia.dev
+# Careful with that command: it prints the *merged* result of all three
+# layers, so it shows our values back at us. Real defaults need an empty
+# config and state dir (NOCTALIA_CONFIG_HOME / NOCTALIA_STATE_HOME) and the
+# unwrapped binary, because the wrapper pins NOCTALIA_CONFIG_HOME.
+#
+# Defaults for a bar come from noctalia's `[bar.default]`, not from the name
+# we use: our bar is `[bar.main]`, and every bar gets the same defaults.
 #
 # Fonts and colours are NOT here: they come from the palette
 # (modules/system/theme/palette.nix) and are added in noctalia.nix.
@@ -30,20 +37,28 @@
 #   --save would write it back.
 #   (This list is read from this file as it is on disk, so a change here
 #   works at once, without a rebuild.)
+# ignore: lockscreen_widgets.widget lockscreen_widgets.widget_order lockscreen_widgets.schema_version
+#   The lock screen's widget editor. It writes one block per output, keyed by
+#   monitor name (HDMI-A-1, ...) with pixel positions for that exact screen
+#   layout, plus a schema version of its own - machine-specific bookkeeping,
+#   not settings. `lockscreen_widgets.enabled` and `lockscreen_widgets.grid`
+#   are real preferences and still save normally.
 
 [shell]
 corner_radius_scale = 0.2  # 0 = square corners, 1 = noctalia's default
 telemetry_enabled = false  # no startup ping (also noctalia's default)
 setup_wizard_enabled = false  # the config is here; never ask on first start
+polkit_agent = true  # noctalia asks for passwords instead of a separate agent
 
 [shell.animation]
 speed = 2.0  # 2x faster than default
 
-[shell.launcher]
-# Mod+Space: a search field, the category row and the results, like the
-# launcher in noctalia 4. Its own default is "full", which is wider and adds
-# a profile row and view tabs - try it, it is one word.
-layout = "simple"
+[shell.panel]
+transparency_mode = "glass"  # blurred panels, not noctalia's flat "solid"
+
+[backdrop]
+# The dimmed layer behind a panel or the launcher.
+blur_intensity = 0.2  # 0.5 by default; barely blur what is behind it
 
 [theme]
 mode = "dark"
@@ -61,15 +76,17 @@ enable_community_templates = false
 # names: either an id noctalia knows (`launcher`, `tray`, ...) or a name from
 # a [widget.<name>] section further down that says what `type` it is.
 position = "top"
+thickness = 24  # 34 by default; just tall enough for the pills
 margin_ends = 0  # full width, no gap at the ends
 margin_edge = 0  # flush with the screen edge
 background_opacity = 0.0  # the bar itself is invisible ...
 capsule = true  # ... only the widgets show, each in its own pill
 capsule_opacity = 0.5
-compositor_blur = false  # don't ask niri to blur the (invisible) bar
-start = ["launcher", "group:sysmon", "active-window", "media"]
-center = ["workspaces"]
-end = ["tray", "notifications", "volume", "brightness", "clock", "control-center"]
+capsule_padding = 3.0  # 6.0 by default; less air inside each pill
+capsule_radius = 4  # noctalia has no default here: unset follows the bar
+start = ["launcher", "group:sysmon", "workspaces"]
+center = ["active_window"]
+end = ["media", "tray", "notifications", "volume", "brightness", "clock", "control-center"]
 
 [[bar.main.capsule_group]]
 # CPU, temperature and memory in one shared pill, the way noctalia 4 drew its
@@ -103,12 +120,22 @@ stat = "ram_used"
 labels_only_when_occupied = true  # a number only where something is open
 max_label_chars = 2
 
+[widget.media]
+# Only on screen while something is playing. Noctalia leaves this off by
+# default, so the widget would sit there empty. It is first in the `end`
+# lane above, i.e. the inner end of the right-hand group: appearing grows
+# the group leftwards into the empty middle instead of shifting the clock.
+hide_when_no_media = true
+
 [widget.clock]
 format = "{:%H:%M %a, %b %d}"
 tooltip_format = "{:%A, %d %B %Y}"
 
 [widget.control-center]
 glyph = "power"
+
+[control_center.calendar]
+show_week_numbers = true
 
 [wallpaper]
 # The images from flakeos/wallpapers/, installed to /etc/wallpapers by
