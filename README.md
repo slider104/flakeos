@@ -286,7 +286,8 @@ the next boot.
   ```
 - Something doesn't work after the update? Pick the previous generation in
   the boot menu. `flake.lock` is in git, so `git diff flake.lock` shows what
-  moved, and `git checkout flake.lock` goes back to the old versions.
+  moved, and `git checkout flake.lock` goes back to the old versions. The
+  whole picture is in [How risky is an update?](#how-risky-is-an-update).
 
 `nup` builds everything *before* it changes the boot menu, so an update that
 does not build cannot damage the running system. It also puts `flake.lock`
@@ -297,6 +298,84 @@ is left alone and says so.)
 A successful `nup` ends with a list of what actually changes at the next
 boot: package names with their old and new version, and how much the system
 grows or shrinks.
+
+### How risky is an update?
+
+**The idea:** an update can cost you time, never the machine. The new system
+is built completely before anything switches over, and the old one stays in
+the boot menu afterwards. So every way an update can go wrong has a way back
+that needs no Nix knowledge at all.
+
+Four things can happen, the common ones first:
+
+1. **The build fails.** The harmless one: nothing changed, `nup` put
+   `flake.lock` back, you are on the same system as before. Usually not your
+   config - unstable had a bad day. See
+   [When a package doesn't build](#when-a-package-doesnt-build).
+2. **It builds, but something behaves differently afterwards.** Reboot and
+   pick an older generation in the boot menu.
+3. **A NixOS option was renamed.** The rebuild stops and the message names
+   the old option, usually together with the new one. A few times a year,
+   mostly around the releases in May and November. Mechanical to fix.
+4. **A program changed its config format.** The rare one, and the only one
+   that is real work: the new version ignores what we wrote for the old one,
+   so those settings have to be written again. noctalia 4 → 5 in October 2026
+   was this.
+
+**The three ways back**, none of which need you to understand the error:
+
+- Case 1, you never left the old system: nothing to do. The last lines of
+  `~/flakeos/logs/update_<date>.log` say what broke, and `git diff flake.lock`
+  what would have moved.
+- Case 2, back to the old system: reboot and pick an older generation in the
+  boot menu (shown for 5 seconds). To see beforehand what those entries are:
+  ```sh
+  nixos-rebuild list-generations
+  ```
+- Cases 2 to 4, back to the old *versions*, so the next rebuild stops bringing
+  the new ones:
+  ```sh
+  cd ~/flakeos
+  ```
+  ```sh
+  git checkout flake.lock
+  ```
+  ```sh
+  nrs
+  ```
+
+**Where the risk actually sits.** Cases 3 and 4 need a program to change
+something, so the only question is which of ours change often:
+
+- **noctalia** is the one to watch: a young project that still changes shape,
+  and the only program here that is *hand*-wrapped - no module in
+  nix-wrapper-modules absorbs its changes for us, so
+  `programs/noctalia/noctalia.nix` is ours to fix. Its config is checked while
+  the system is built (`noctalia config validate`), so a key that no longer
+  exists fails the rebuild instead of leaving you with a bar that won't start.
+- **niri** and **nix-wrapper-modules** are young too, but with small option
+  surfaces: changes are few and named in their release notes.
+- Everything else - alacritty, zsh, mpv, Steam, PipeWire, systemd-boot, zram,
+  disko - has a settled config format. These effectively never need work after
+  an update.
+
+**Habits that make it cheaper:**
+
+- Update when you have a free hour, not on the evening you need the machine.
+- After `nup` and the reboot, spend two minutes trying the things you care
+  about: bar, sound, Wi-Fi, a game. Noticing a problem while you still
+  remember that you updated is half the work.
+- Update regularly rather than rarely. In small steps `nup`'s version list
+  points straight at the suspect; after half a year everything moved at once.
+- Update zeus first and let hermes follow a few days later (`git pull`), so
+  the laptop is never the one that finds the problem.
+- Keep the NixOS installer stick in a drawer. The one thing that cannot be
+  repaired from inside the system is a forgotten password, see
+  [Something broke?](#something-broke).
+- Twice a year, when a new NixOS release comes out: point `nixpkgs-stable` in
+  `flake.nix` at it (`nixos-26.11`, then `nixos-27.05`, …). Nothing depends on
+  it day to day, but the escape hatch below only works while the two nixpkgs
+  are reasonably close together.
 
 ### When a package doesn't build
 
@@ -698,6 +777,9 @@ so the history stays a straight line.
   same one. They only drift apart if one runs `nup` and doesn't push.
 
 ## Something broke?
+
+Broke right after an update? [How risky is an update?](#how-risky-is-an-update)
+sorts the four cases and the way back out of each one.
 
 - **The rebuild failed:** nothing changed, you're still on the old system.
   The last lines of the error name the file and line. The full output is in
