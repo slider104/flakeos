@@ -109,7 +109,7 @@ running system. You still need `nrs` for that.
 ## The SSH key
 
 Pushing uses your SSH key at `~/.ssh/id_ed25519` — never a password or a
-token. This is already set up on both machines:
+token. It is already wired up in the repo:
 
 - `modules/programs/git/gitconfig` sends every push to GitHub over SSH, even
   though the repo was cloned with an `https://` URL.
@@ -122,8 +122,9 @@ So once the key is on the machine, pushing from Zed just works. Check the key:
 ssh -T git@github.com
 ```
 
-It should answer **"Hi slider104!"**. If it says "Permission denied
-(publickey)", the key is missing or has the wrong permissions:
+It should answer **"Hi <your GitHub name>!"** — whichever GitHub account the
+key belongs to. If it says "Permission denied (publickey)", the key is missing
+or has the wrong permissions:
 
 ```sh
 chmod 700 ~/.ssh
@@ -144,6 +145,8 @@ No key yet, or you want your own GitHub repo?
 ---
 
 ## Two machines
+
+Relevant once you run flakeos on more than one PC; skip it otherwise.
 
 **How it works:** each machine has its own copy of the repo, and they only
 line up once one machine pushes and the other pulls. `gitconfig` sets
@@ -309,5 +312,5 @@ git checkout <file>         # throw away my changes to one file
 git checkout flake.lock     # undo an update (then: nrs)
 git rebase --abort          # back out of a conflicted pull
 
-ssh -T git@github.com       # is my key working? -> "Hi slider104!"
+ssh -T git@github.com       # is my key working? -> "Hi <your name>!"
 ```

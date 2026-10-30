@@ -167,7 +167,7 @@ game runs, and then puts everything back.
   gamemoded -s
   ```
 
-Your user is in the `gamemode` group (`modules/users/slider.nix`), so it can
+Your user is in the `gamemode` group (its file in `modules/users/`), so it can
 change the CPU governor **without a password prompt**. Without that group you
 would get a polkit dialog in the middle of launching a game.
 

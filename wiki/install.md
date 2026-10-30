@@ -602,7 +602,7 @@ another user).
    ```sh
    chmod 600 ~/.ssh/id_ed25519
    ```
-   Check, it should answer "Hi slider104!":
+   Check, it should answer "Hi <your GitHub name>!":
    ```sh
    ssh -T git@github.com
    ```

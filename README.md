@@ -4,6 +4,14 @@ A minimal NixOS config for **zeus** (gaming desktop) and **hermes** (laptop):
 niri + noctalia, one Adwaita-dark look everywhere, ready for gaming. No
 home-manager.
 
+It's a config for two real machines rather than a framework, so you can read
+it, copy pieces out of it, or install the whole thing and make it yours:
+[wiki/install.md](wiki/install.md) goes from a USB stick to a working desktop
+in about an hour, and its last step swaps the personal bits (name, hosts,
+locale, keyboard) for yours. Everything is explained for someone who has
+never used NixOS — the [wiki](wiki/README.md) is the long version of this
+page.
+
 ## The three ideas
 
 1. **Dendritic.** `flake.nix` hands *every* `.nix` file under `modules/` to
@@ -24,8 +32,8 @@ home-manager.
 3. **One palette.** GTK apps use the standard adw-gtk3-dark theme, and
    `modules/system/theme/palette.nix` holds the same Adwaita-dark colours
    (plus fonts and cursor) for everything else: alacritty, niri, noctalia,
-   Zed, MangoHud, imv and the TTY. So it all looks like one system. (Your RGB
-   lights keep their own cyan, set in `programs/openrgb/openrgb.nix`.)
+   Zed, MangoHud, imv and the TTY. So it all looks like one system. (The RGB
+   lights on zeus keep their own cyan, set in `programs/openrgb/openrgb.nix`.)
 
 ## Layout
 
@@ -80,8 +88,8 @@ modules = with self.nixosModules; [
 
 ## The wiki
 
-The detailed guides live in [`wiki/`](wiki/README.md), one file per topic.
-Everything there is written for someone who has never used NixOS.
+The detailed guides live in [`wiki/`](wiki/README.md), one file per topic. No
+previous knowledge assumed, and no page assumes you read another one first.
 
 | you want to… | read |
 |---|---|

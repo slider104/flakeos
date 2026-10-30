@@ -438,7 +438,7 @@ How the pieces fit:
    reads the keyboards and mice directly from `/dev/input` — which needs the
    `input` group.
 
-Both groups are on your user already (`modules/users/slider.nix`). Its own
+Both groups are on your user already (its file in `modules/users/`). Its own
 settings live in `~/.config/autoclicker/settings.json`, written by the window.
 
 - Nothing clicks until you press **Start**. Stop, or closing the window, ends

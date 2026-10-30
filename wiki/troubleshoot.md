@@ -479,7 +479,7 @@ ISO from https://nixos.org/download/.
   ```
 - Step into your installed system and set a new password:
   ```sh
-  sudo nixos-enter --root /mnt -c 'passwd slider'
+  sudo nixos-enter --root /mnt -c 'passwd <your user name>'
   ```
 - Restart, pull the stick out:
   ```sh
@@ -526,9 +526,10 @@ Working from the outside in:
    ```sh
    sudo nixos-enter --root /mnt
    ```
-   You are now root inside your own system, with `/home/slider/flakeos`
-   exactly as you left it. `nano`, fix, `nixos-rebuild switch --flake
-   /home/slider/flakeos`, `exit`, `reboot`.
+   You are now root inside your own system, with the repo still at
+   `/home/<your user name>/flakeos` exactly as you left it. `nano`, fix,
+   `nixos-rebuild switch --flake /home/<your user name>/flakeos`, `exit`,
+   `reboot`.
 
 Step 5 is the real floor of this system. As long as the disk spins and you
 have a USB stick, your config is reachable and buildable.

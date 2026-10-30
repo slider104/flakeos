@@ -265,7 +265,7 @@ A nice use of all this: try a risky change on a fake machine first.
   ```sh
   systemctl status libvirtd
   ```
-  And are you in the group? (You are, via `modules/users/slider.nix`, but a
+  And are you in the group? (You are, via your file in `modules/users/`, but a
   freshly added user needs a logout.)
   ```sh
   groups

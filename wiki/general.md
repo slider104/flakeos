@@ -49,9 +49,12 @@ The shell inside it is **zsh**. It greets you with a two-line prompt:
 
 | part | means |
 |---|---|
-| `slider@zeus` | who you are, and which machine you are on. Handy when you are logged into the other one |
+| `slider@zeus` | who you are, and which machine you are on. Handy the moment you are logged into a second machine |
 | `~/flakeos` | the folder you are *in* right now. Every command you type acts here unless you give it a path |
 | `❯` | type here. It is **green** when the last command worked and **red** when it failed — the quickest error check there is |
+
+The names in that example are this repo's: the user `slider`, the desktop
+`zeus`. Your own prompt shows your user name and your hostname.
 
 Deep folders are shortened to the last three parts: `…/a/b/c`.
 
@@ -120,7 +123,8 @@ Three small things this config adds on top of plain zsh:
 
 ### Paths: where am I, and what is `~`
 
-- `~` is your home folder. `~/flakeos` is `/home/slider/flakeos`.
+- `~` is your home folder, `/home/<your user name>`. So `~/flakeos` is
+  `/home/<your user name>/flakeos`.
 - A path starting with `/` is **absolute**: it means the same thing from
   anywhere. `/etc/wallpapers` is always `/etc/wallpapers`.
 - A path *not* starting with `/` is **relative to the folder you are in**.
@@ -165,7 +169,7 @@ sudo systemctl restart openrgb
 - `sudo` remembers your password for a few minutes, so a second command right
   after does not ask again.
 - You can do this because your user is in the group `wheel`
-  (`modules/users/slider.nix`).
+  (its file in `modules/users/`).
 
 ### When you don't know a command
 

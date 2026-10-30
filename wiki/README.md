@@ -7,6 +7,11 @@ The [main README](../README.md) is the short version: what flakeos is, the
 keys, the commands, and where to change what. This folder is the long
 version.
 
+**Just found flakeos and want to try it?** [install.md](install.md) takes you
+from a USB stick to a working desktop, and its last step is swapping the
+personal bits for your own. Everything else here is about living with the
+system afterwards.
+
 ## Which page do I want?
 
 **Getting started**
@@ -53,6 +58,11 @@ version.
   ```
 - Paths like `programs/zsh/zshrc` are inside `modules/`. Paths starting with
   `wiki/` or `blueprints/` are from the repo root.
+- flakeos is a config for two real machines, so the pages use their real
+  names: the user **slider**, the desktop **zeus**, the laptop **hermes**. On
+  your own install those are your user name and your hostnames — read
+  `/home/slider` as your home folder, and anything marked **(zeus)** as "only
+  on the machine that has that hardware".
 - Copy and paste in the terminal is **Ctrl+Shift+C** and **Ctrl+Shift+V**
   (plain Ctrl+C stops the running command instead).
 - Never read a page to the end before typing? At least read the current
