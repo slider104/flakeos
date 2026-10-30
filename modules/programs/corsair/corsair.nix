@@ -78,6 +78,11 @@
       };
     };
 
+    # `services.keyd` only runs the daemon, so the commands in the comments
+    # below (`keyd list-keys`, `sudo keyd monitor`, `keyd list-devices`) had
+    # nothing to run. This puts them on PATH.
+    environment.systemPackages = [pkgs.keyd];
+
     # If a button is wrong, read off what it actually sends:
     #   sudo nix run nixpkgs#evtest
     # pick the "Corsair CORSAIR SCIMITAR RGB ELITE Gaming Mouse Keyboard"

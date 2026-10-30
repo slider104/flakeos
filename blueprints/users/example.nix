@@ -1,6 +1,6 @@
 {
   # BLUEPRINT: a person with a login.
-  # How to use it: blueprints/README.md
+  # How to use it: wiki/blueprints.md
   # A host gets this user by listing `example` in its modules.
   # Real one in this repo: users/slider.nix.
   flake.nixosModules.example = {config, ...}: {

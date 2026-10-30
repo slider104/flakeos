@@ -1,6 +1,6 @@
 {
   # BLUEPRINT: a system setting (a service, hardware support, a kernel option, ...).
-  # How to use it: blueprints/README.md
+  # How to use it: wiki/blueprints.md
   # One topic per file, named after the topic (like audio.nix or bluetooth.nix).
   # Real ones in this repo: system/audio.nix, system/bluetooth.nix.
   #

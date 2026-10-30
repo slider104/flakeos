@@ -1,6 +1,6 @@
 {inputs, ...}: {
   # BLUEPRINT: a program that is NOT in nixpkgs but ships its own flake.
-  # How to use it: blueprints/README.md
+  # How to use it: wiki/blueprints.md
   # Always check nixpkgs first (https://search.nixos.org/packages): one less
   # input to keep updated.
   #

@@ -1,7 +1,7 @@
 {
   # BLUEPRINT: a program that is NOT wrapped. For programs that keep their own
   # settings (Steam, launchers, GUI apps with a settings dialog) or need nothing.
-  # How to use it: blueprints/README.md
+  # How to use it: wiki/blueprints.md
   # Real ones in this repo: programs/steam/, programs/lutris/.
   flake.nixosModules.example = {
     pkgs,

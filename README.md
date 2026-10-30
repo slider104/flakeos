@@ -1,7 +1,8 @@
 # flakeos
 
 A minimal NixOS config for **zeus** (gaming desktop) and **hermes** (laptop):
-niri + noctalia, one Adwaita-dark look everywhere, ready for gaming. No home-manager.
+niri + noctalia, one Adwaita-dark look everywhere, ready for gaming. No
+home-manager.
 
 ## The three ideas
 
@@ -31,29 +32,32 @@ niri + noctalia, one Adwaita-dark look everywhere, ready for gaming. No home-man
 ```
 assets/                   just assets like logos for the system (not wallpapers)
 wallpapers/               your wallpapers, installed to /etc/wallpapers (pick one with Mod+W)
+wiki/                     the guides: one file per topic (see below)
 blueprints/               templates to copy into modules/ (not used by the system itself)
 modules/
 ├── setup/                how the flake is wired + the disk layout (not day-to-day)
 │   ├── parts.nix         flake-parts, wrapper library, `nix fmt`
-│   ├── disko.nix         ESP + ext4 root, shared by all hosts
-│   └── README.md         the installation guide
+│   └── disko.nix         ESP + ext4 root, shared by all hosts
 ├── system/               OS settings, one topic per file
-│   ├── boot  nix  network  locale  audio  bluetooth  fonts  libvirt  login  polkit  xdg
+│   ├── audio  bluetooth  boot  dconf  fonts  libvirt  locale  login  network
+│   ├── nix  nix-ld  polkit  reboot  stable  xdg
 │   └── theme/            palette.nix (THE colours) + theme.nix (GTK/Qt/cursor/TTY)
 ├── programs/             one folder per program: <name>.nix + its native config file(s)
 │   ├── niri/             niri.nix + config.kdl
-│   ├── noctalia/         noctalia.nix + config.toml
+│   ├── noctalia/         noctalia.nix + config.toml + noctalia-changes.py
 │   ├── alacritty/        alacritty.nix + alacritty.toml
 │   ├── zsh/              zsh.nix + zshrc
 │   ├── zed/              zed.nix (+ palette theme) + settings.json
 │   ├── git/  mpv/  mangohud/  (+ config file)    btop/  imv/  bat/  (settings inline)
-│   ├── firefox/ brave/ thunar/ steam/ gamemode/ gamescope/ prismlauncher/ lutris/ openrgb/
+│   ├── firefox/ brave/ thunar/ steam/ gamemode/ gamescope/ prismlauncher/ lutris/
 │   ├── shortwave/ rnote/ libreoffice/ rustdesk/ mediawriter/ claude-code/ fresh/
-│   ├── virt-manager/     virt-manager.nix + README.md (the guide for VMs)
+│   ├── virt-manager/     the window for virtual machines
+│   ├── openrgb/ corsair/ the RGB lighting and the mouse's side buttons (zeus)
+│   ├── ydotool/          the Autoclicker
 │   └── nix-tools/ (nixd, nil, alejandra)   cli/ (small tools, no config)
 ├── grouped/              bundles a host picks from
-│   ├── base.nix          every machine: boot, nix, network, locale, zsh, git, btop, bat, cli
-│   ├── desktop.nix       login, polkit, audio, theme, niri, noctalia, alacritty, firefox, brave, zed, apps, ...
+│   ├── base.nix          every machine: boot, nix, network, locale, zsh, git, btop, bat, cli, …
+│   ├── desktop.nix       login, polkit, audio, theme, niri, noctalia, alacritty, browsers, zed, apps, …
 │   ├── gaming.nix        steam, gamemode, gamescope, mangohud, prismlauncher, lutris
 │   └── vm.nix            virtual machines: KVM/QEMU/libvirt + virt-manager
 ├── users/
@@ -68,20 +72,32 @@ A host file just lists what the machine gets:
 ```nix
 modules = with self.nixosModules; [
   zeus-hardware zeus-disko   # this machine
-  base desktop gaming        # grouped/
-  openrgb                    # a single program, just for zeus
+  base desktop gaming vm     # grouped/
+  openrgb corsair            # single programs, just for zeus
   slider                     # users/
 ];
 ```
 
-## Which README?
+## The wiki
+
+The detailed guides live in [`wiki/`](wiki/README.md), one file per topic.
+Everything there is written for someone who has never used NixOS.
 
 | you want to… | read |
 |---|---|
-| use the system every day: keys, commands, where to change what | this file, below |
-| add a program, a system setting, a bundle, a user or a machine | [`blueprints/README.md`](blueprints/README.md) |
-| install flakeos on a PC, or reinstall a configured host like zeus | [`modules/setup/README.md`](modules/setup/README.md) |
-| set up a virtual machine, and get its screen and clipboard right | [`modules/programs/virt-manager/README.md`](modules/programs/virt-manager/README.md) |
+| understand the terminal, how NixOS thinks, what every command does | [wiki/general.md](wiki/general.md) |
+| install flakeos on a PC, or reinstall a configured host like zeus | [wiki/install.md](wiki/install.md) |
+| learn the window manager properly: the strip, every key, window rules | [wiki/niri.md](wiki/niri.md) |
+| work with the bar, launcher and notifications — and keep your changes | [wiki/noctalia.md](wiki/noctalia.md) |
+| know where a program's settings live and whether they survive a reinstall | [wiki/settings.md](wiki/settings.md) |
+| change colours, fonts, cursor or icons | [wiki/theming.md](wiki/theming.md) |
+| game: Steam, Proton, GameMode, gamescope, MangoHud, Lutris | [wiki/gaming.md](wiki/gaming.md) |
+| run another operating system in a window | [wiki/virtualisation.md](wiki/virtualisation.md) |
+| add a program, a system setting, a bundle, a user or a machine | [wiki/blueprints.md](wiki/blueprints.md) |
+| update, and know exactly how to get back if it goes wrong | [wiki/updating.md](wiki/updating.md) |
+| commit, push, pull, and keep two machines in step | [wiki/git.md](wiki/git.md) |
+| **fix something that's broken**: logs, services, rollbacks, recovery | [wiki/troubleshoot.md](wiki/troubleshoot.md) |
+| sound, Bluetooth, monitors, RGB, the mouse, the data drive | [wiki/hardware.md](wiki/hardware.md) |
 
 ---
 
@@ -112,44 +128,20 @@ each other (up/down), each with its own strip.
 | Mod+F | make the column full width (again: back) |
 | Mod+Shift+F | fullscreen |
 | Mod+Shift+R | cycle column width: 1/3, 1/2, 2/3 |
+| Mod+A | make the window floating, or tile it again |
 | Mod+O | overview of all windows and workspaces |
 | Mod+1 … Mod+9 | go to workspace 1 … 9 (Mod+Shift+1 … 9: take the window along) |
 | Mod+Page_Up / Page_Down | workspace above / below |
-| Mod+S / Mod+Ctrl+S | screenshot of the window / the monitor (saved to `~/Pictures/Screenshots`, also copied) |
+| Mod+S / Mod+Ctrl+S / Mod+Shift+S | screenshot of the window / the monitor / a region (saved to `~/Pictures/Screenshots`, also copied) |
 | Mod+W | pick a wallpaper |
 | Mod+N | notification history |
-| Mod+Comma | noctalia settings (see [Keeping noctalia settings](#keeping-noctalia-settings)) |
+| Mod+Comma | noctalia settings |
 | Mod+Alt+L | session menu: lock, suspend, reboot, power off |
 | Mod+Escape | a game or VM swallows all shortcuts? This gives them back |
 
 All binds live in `programs/niri/config.kdl` (section `binds`). Each has a
-`hotkey-overlay-title`, which is the text Mod+BackSpace shows.
-
-## Window rules
-
-Most windows tile, i.e. they open as a new column. niri opens a window
-*floating* (on top, freely movable) by itself if the program says it is a
-dialog or that it cannot be resized. Everything else is a **window rule** in
-`programs/niri/config.kdl` (section `window-rule`), like the one that makes
-the autoclicker float.
-
-- **Mod+A** makes the focused window floating or tiled again, just for now.
-  Mod+Ctrl+A jumps between the floating and the tiled windows.
-- A rule needs the window's *app ID*, which is rarely the program's name. Ask
-  niri while the window is open:
-  ```sh
-  niri msg windows
-  ```
-  It lists every open window with its app ID, title and whether it floats.
-  Copy the app ID into a rule:
-  ```kdl
-  window-rule {
-      match app-id=r#"^org\.flakeos\.Autoclicker$"#
-      open-floating true
-  }
-  ```
-  `open-floating false` does the opposite: it keeps a window tiled that niri
-  would have floated on its own.
+`hotkey-overlay-title`, which is the text Mod+BackSpace shows. The full list,
+with the layout model explained: [wiki/niri.md](wiki/niri.md).
 
 ## Terminal commands
 
@@ -164,44 +156,43 @@ The shell is zsh. These aliases are defined in `programs/zsh/zshrc`:
 | `nck` | check the config for errors without building anything |
 | `ncg` | delete old system versions (generations) older than 30 days, frees disk space |
 | `ll` | `ls -lah`: list all files with sizes |
-| `noctalia-changes` | show what you changed in noctalia's settings window (see below) |
-| `dconf-changes` | show what you changed in a GTK app that saves its own settings (rnote, Shortwave, virt-manager) |
+| `noctalia-changes` | show what you changed in noctalia's settings window ([guide](wiki/noctalia.md)) |
+| `dconf-changes` | show what you changed in a GTK app that saves its own settings (rnote, Shortwave, virt-manager) ([guide](wiki/settings.md)) |
 
 - `nrs`, `nrb`, `nup`, `ndb` work the same on every machine: the flake picks
   the config whose name matches the hostname (`zeus`, `hermes`).
 - `ndb` before `nrs`/`nrb` when you changed a lot: it reads the whole config
   for **this** machine and stops at the recipes instead of building them, so
   it finds a typo or a wrong option name in seconds and needs no password.
-  It also prints what would be built and downloaded, which tells you how big
-  an update is before you start it. `nck` asks the wider question: it checks
-  **every** host and module in the flake, so it also catches breaking the
-  other machine. Use it before you push. Neither one can find errors that
-  only show up while a package is being built, so a rebuild can still fail
-  after a clean `ndb` or `nck` - it just fails while building, and the
-  running system stays untouched.
+  `nck` asks the wider question: it checks **every** host and module in the
+  flake, so it also catches breaking the other machine. Use it before you
+  push. Neither one can find errors that only show up while a package is being
+  built.
 - Each alias shows its output as usual **and** saves it to
-  `~/flakeos/logs/<kind>_<date>.log` (e.g. `logs/rebuild_2026-09-12-14:03:22.log`).
-  Handy when an error scrolled away. `logs/` is ignored by git; delete the
-  files whenever you like.
+  `~/flakeos/logs/<kind>_<date>.log`. Handy when an error scrolled away.
+  `logs/` is ignored by git; delete the files whenever you like.
 - Old generations are also deleted automatically once a week
   (`system/nix.nix`), so `ncg` is only needed when the disk gets full.
 - `nix fmt .` (in `~/flakeos`) tidies up the formatting of all Nix files.
 
+Which command when, and everything else a terminal can do for you:
+[wiki/general.md](wiki/general.md).
+
 ## Changing something
 
 **How it works:** the files in `~/flakeos` *are* the system. A rebuild
-(`nrs`) reads them and builds a complete new system version, a
-*generation*, then switches to it. The old one stays on disk and in the boot
-menu, so a broken change is never a disaster (see
-[Something broke?](#something-broke)).
+(`nrs`) reads them and builds a complete new system version, a *generation*,
+then switches to it. The old one stays on disk and in the boot menu, so a
+broken change is never a disaster
+([wiki/troubleshoot.md](wiki/troubleshoot.md)).
 
 - Open the repo in Zed (or press Mod+Z and open `~/flakeos`):
   ```sh
   zeditor ~/flakeos
   ```
 - Change the file (see the table below for which one).
-- **Made a new file?** Tell git about it, or the flake doesn't see it (no
-  error, your change is just missing):
+- **Made a new file?** Tell git, or the flake doesn't see it (no error, your
+  change is just missing):
   ```sh
   cd ~/flakeos
   ```
@@ -213,8 +204,8 @@ menu, so a broken change is never a disaster (see
   nrs
   ```
 - Programs that are already open keep their old config. Close and reopen
-  them. For the bar (noctalia), log out and back in: Mod+Ctrl+Shift+Q, then
-  log in on the text login screen.
+  them. For the bar (noctalia), see
+  [wiki/noctalia.md](wiki/noctalia.md#restarting-it).
 
 ## Where do I change…?
 
@@ -222,9 +213,9 @@ menu, so a broken change is never a disaster (see
 |---|---|
 | keyboard layout | `system/locale.nix` (text console) **and** `programs/niri/config.kdl` (desktop, `layout "de"`) |
 | time zone, date / number formats | `system/locale.nix` |
-| key binds, gaps, window rules, mouse / touchpad | `programs/niri/config.kdl` - floating windows: [Window rules](#window-rules) |
-| colours, fonts, cursor, icons | `system/theme/palette.nix` |
-| bar, launcher, notifications, weather location | noctalia's settings window + `noctalia-changes`, or `programs/noctalia/config.toml` |
+| key binds, gaps, window rules, mouse / touchpad | `programs/niri/config.kdl` — guide: [wiki/niri.md](wiki/niri.md) |
+| colours, fonts, cursor, icons | `system/theme/palette.nix` — guide: [wiki/theming.md](wiki/theming.md) |
+| bar, launcher, notifications, weather location | noctalia's settings window + `noctalia-changes`, or `programs/noctalia/config.toml` — guide: [wiki/noctalia.md](wiki/noctalia.md) |
 | terminal (see-through, font size) | `programs/alacritty/alacritty.toml` |
 | aliases, prompt, shell history | `programs/zsh/zshrc` |
 | git name and e-mail | `programs/git/gitconfig` |
@@ -232,215 +223,26 @@ menu, so a broken change is never a disaster (see
 | Brave extensions and settings (2nd browser) | `programs/brave/brave.nix` |
 | Zed defaults | `programs/zed/settings.json` (changes made *inside* Zed are saved by Zed itself) |
 | video player | `programs/mpv/mpv.conf` |
-| in-game overlay | `programs/mangohud/MangoHud.conf` |
-| virtual machines | `system/libvirt.nix` (the machinery), `programs/virt-manager/virt-manager.nix` (the window) - guide: [`programs/virt-manager/README.md`](modules/programs/virt-manager/README.md) |
+| in-game overlay | `programs/mangohud/MangoHud.conf` — guide: [wiki/gaming.md](wiki/gaming.md) |
+| virtual machines | `system/libvirt.nix` (the machinery), `programs/virt-manager/virt-manager.nix` (the window) — guide: [wiki/virtualisation.md](wiki/virtualisation.md) |
 | small command-line tools | `programs/cli/cli.nix` |
 | which programs a machine gets | `grouped/*.nix` and `hosts/<host>/<host>.nix` |
-| which app opens which file type | the program's own `.nix` file, see [Default apps](#default-apps) |
+| which app opens which file type | the program's own `.nix` file, see [wiki/general.md](wiki/general.md#7-which-app-opens-which-file) |
 | automatic cleanup, unfree software | `system/nix.nix` |
-| a package on unstable is broken | `system/stable.nix` |
-| settings a program saves by itself (rnote, Shortwave, virt-manager) | nothing to edit by hand: `dconf-changes <program> --save`, see [Keeping GTK app settings (dconf)](#keeping-gtk-app-settings-dconf) |
+| a package on unstable is broken | `system/stable.nix` — guide: [wiki/updating.md](wiki/updating.md#when-a-package-doesnt-build) |
+| settings a program saves by itself (rnote, Shortwave, virt-manager) | nothing to edit by hand: `dconf-changes <program> --save` — guide: [wiki/settings.md](wiki/settings.md) |
 | autoclicker | the Autoclicker window (saves by itself); how it works: `programs/ydotool/ydotool.nix` |
-| RGB colours (zeus) | `programs/openrgb/openrgb.nix` |
+| RGB colours (zeus) | `programs/openrgb/openrgb.nix` — guide: [wiki/hardware.md](wiki/hardware.md#rgb-lighting-zeus) |
+| the mouse's side buttons (zeus) | `programs/corsair/corsair.nix` — guide: [wiki/hardware.md](wiki/hardware.md#the-corsair-mouse-zeus) |
 | the data drive (zeus) | `hosts/zeus/zeus.nix` |
 
-Adding something new (a program, a setting, a user) is explained step by
-step in [`blueprints/README.md`](blueprints/README.md).
-
-## Things to know about wrapped programs
-
-niri, noctalia, alacritty, zsh, git, btop, mpv, imv, mangohud and bat are
-*wrapped*: their config is baked into the program at rebuild.
-
-- Config changes need a **rebuild**. Editing `~/.config/…` does nothing.
-- Settings changed *inside* a wrapped program (btop options) don't survive a
-  restart. noctalia is the exception: it writes what you change in its
-  settings window to a file of its own and keeps it, but that file is not in
-  the repo, so a command copies it in - see
-  [Keeping noctalia settings](#keeping-noctalia-settings).
-- `git config --global` can't write; edit `programs/git/gitconfig`.
-- **Zed** can't be pointed at a config file, so its wrapper links two files
-  into `~/.config/zed/` before every start: `global_settings.json` (our
-  defaults, from `programs/zed/settings.json`) and `themes/palette.json`
-  ("Adwaita Dark (palette)", generated from the palette). Zed's own
-  `settings.json` stays yours: changes made in Zed are saved there and win
-  over our defaults.
-- A wrapped program's config is the same for every user on the machine.
-- Not wrapped *and* no config file to edit? Then it saves into dconf, see
-  [Keeping GTK app settings (dconf)](#keeping-gtk-app-settings-dconf).
-
-## Updating
-
-**How it works:** `flake.lock` pins the exact version of nixpkgs (all
-programs) and the other inputs. Nothing updates by itself; you decide when.
-`nup` moves the pins to the newest versions and builds the new system for
-the next boot.
-
-- Update and build:
-  ```sh
-  nup
-  ```
-- Reboot to use it:
-  ```sh
-  reboot
-  ```
-- Something doesn't work after the update? Pick the previous generation in
-  the boot menu. `flake.lock` is in git, so `git diff flake.lock` shows what
-  moved, and `git checkout flake.lock` goes back to the old versions. The
-  whole picture is in [How risky is an update?](#how-risky-is-an-update).
-
-`nup` builds everything *before* it changes the boot menu, so an update that
-does not build cannot damage the running system. It also puts `flake.lock`
-back in that case: a failed `nup` leaves you exactly where you were, with
-nothing to undo by hand. (Had you already changed `flake.lock` yourself, it
-is left alone and says so.)
-
-A successful `nup` ends with a list of what actually changes at the next
-boot: package names with their old and new version, and how much the system
-grows or shrinks.
-
-### How risky is an update?
-
-**The idea:** an update can cost you time, never the machine. The new system
-is built completely before anything switches over, and the old one stays in
-the boot menu afterwards. So every way an update can go wrong has a way back
-that needs no Nix knowledge at all.
-
-Four things can happen, the common ones first:
-
-1. **The build fails.** The harmless one: nothing changed, `nup` put
-   `flake.lock` back, you are on the same system as before. Usually not your
-   config - unstable had a bad day. See
-   [When a package doesn't build](#when-a-package-doesnt-build).
-2. **It builds, but something behaves differently afterwards.** Reboot and
-   pick an older generation in the boot menu.
-3. **A NixOS option was renamed.** The rebuild stops and the message names
-   the old option, usually together with the new one. A few times a year,
-   mostly around the releases in May and November. Mechanical to fix.
-4. **A program changed its config format.** The rare one, and the only one
-   that is real work: the new version ignores what we wrote for the old one,
-   so those settings have to be written again. noctalia 4 → 5 in October 2026
-   was this.
-
-**The three ways back**, none of which need you to understand the error:
-
-- Case 1, you never left the old system: nothing to do. The last lines of
-  `~/flakeos/logs/update_<date>.log` say what broke, and `git diff flake.lock`
-  what would have moved.
-- Case 2, back to the old system: reboot and pick an older generation in the
-  boot menu (shown for 5 seconds). To see beforehand what those entries are:
-  ```sh
-  nixos-rebuild list-generations
-  ```
-- Cases 2 to 4, back to the old *versions*, so the next rebuild stops bringing
-  the new ones:
-  ```sh
-  cd ~/flakeos
-  ```
-  ```sh
-  git checkout flake.lock
-  ```
-  ```sh
-  nrs
-  ```
-
-**Where the risk actually sits.** Cases 3 and 4 need a program to change
-something, so the only question is which of ours change often:
-
-- **noctalia** is the one to watch: a young project that still changes shape,
-  and the only program here that is *hand*-wrapped - no module in
-  nix-wrapper-modules absorbs its changes for us, so
-  `programs/noctalia/noctalia.nix` is ours to fix. Its config is checked while
-  the system is built (`noctalia config validate`), so a key that no longer
-  exists fails the rebuild instead of leaving you with a bar that won't start.
-- **niri** and **nix-wrapper-modules** are young too, but with small option
-  surfaces: changes are few and named in their release notes.
-- Everything else - alacritty, zsh, mpv, Steam, PipeWire, systemd-boot, zram,
-  disko - has a settled config format. These effectively never need work after
-  an update.
-
-**Habits that make it cheaper:**
-
-- Update when you have a free hour, not on the evening you need the machine.
-- After `nup` and the reboot, spend two minutes trying the things you care
-  about: bar, sound, Wi-Fi, a game. Noticing a problem while you still
-  remember that you updated is half the work.
-- Update regularly rather than rarely. In small steps `nup`'s version list
-  points straight at the suspect; after half a year everything moved at once.
-- Update zeus first and let hermes follow a few days later (`git pull`), so
-  the laptop is never the one that finds the problem.
-- Keep the NixOS installer stick in a drawer. The one thing that cannot be
-  repaired from inside the system is a forgotten password, see
-  [Something broke?](#something-broke).
-- Twice a year, when a new NixOS release comes out: point `nixpkgs-stable` in
-  `flake.nix` at it (`nixos-26.11`, then `nixos-27.05`, …). Nothing depends on
-  it day to day, but the escape hatch below only works while the two nixpkgs
-  are reasonably close together.
-
-### When a package doesn't build
-
-Unstable moves fast, so now and then a package there is broken for a few
-days - and it can be one you never asked for. In October 2026 `breakpad`
-stopped compiling; noctalia depends on it, so nothing built at all.
-
-You don't have to freeze the whole system for that. `modules/system/stable.nix`
-keeps a second, slower-moving nixpkgs around. Nothing uses it until you say
-so, in one of two ways:
-
-- **One program from stable**, nothing else touched. `pkgs.stable` works like
-  `pkgs` in any module:
-  ```nix
-  environment.systemPackages = [pkgs.stable.inkscape];
-  ```
-- **One package replaced everywhere**, including inside other packages that
-  need it - the breakpad case. Uncomment a line in `system/stable.nix`:
-  ```nix
-  breakpad = final.stable.breakpad; # 2026-10-04: link error, nixpkgs#569271
-  ```
-
-Write next to the line what broke, and delete it again once unstable is
-fixed. The file itself explains both ways and what they cost.
-
-One warning for programs that draw on screen: a borrowed package brings its
-own libraries, but the graphics driver always comes from the running system.
-If the two nixpkgs are far apart, the driver can't load into that program and
-it starts up showing nothing at all. For those, point `nixpkgs-stable` in
-`flake.nix` at an unstable commit from just before the breakage instead of at
-the release branch. `system/stable.nix` has the full story.
-
-## Default apps
-
-Which program opens which file type is set in each program's own module
-(`xdg.mime.defaultApplications`):
-
-| files | open in |
-|---|---|
-| videos, music | mpv |
-| images | imv |
-| folders | Thunar |
-| archives (zip, 7z, rar, tar) | xarchiver |
-| web links, HTML, PDFs | Firefox |
-| text files | Zed |
-| office documents | LibreOffice |
-
-Check which app a type goes to:
-
-```sh
-xdg-mime query default image/png
-```
+Adding something new (a program, a setting, a user, a machine) is explained
+step by step in [wiki/blueprints.md](wiki/blueprints.md).
 
 ## Wallpapers
 
 Mod+W picks a picture from `wallpapers/` (repo root); it stays across logins
-(noctalia remembers it). Want it to change by itself instead? Add a
-`[wallpaper.automation]` section to `programs/noctalia/config.toml`:
-
-```toml
-[wallpaper.automation]
-enabled = true
-interval_seconds = 1800
-order = "random"
-```
+(noctalia remembers it).
 
 - Put the picture into `~/flakeos/wallpapers/`, then:
   ```sh
@@ -454,354 +256,29 @@ order = "random"
   ```
 - Press Mod+W and pick it.
 
-## Keeping noctalia settings
+Want it to change by itself instead? Add a `[wallpaper.automation]` section to
+`programs/noctalia/config.toml`:
 
-**How it works:** noctalia reads its settings from two files, in this order:
-
-1. `programs/noctalia/config.toml` - ours, baked into the store at rebuild
-2. `~/.local/state/noctalia/settings.toml` - written by noctalia itself
-   whenever you change something in its settings window (Mod+Comma)
-
-The second one wins. That is deliberate on noctalia's side: it means the
-settings window keeps working even though our file is read-only in the
-store. It also means that file *is* the list of your own changes - so
-`noctalia-changes` simply shows it, and `--save` copies it into
-`config.toml`, comments and all.
-
-- Change things in the settings window (Mod+Comma) until you like them. They
-  take effect at once and stay, also after a reboot.
-- Show what you changed:
-  ```sh
-  noctalia-changes
-  ```
-- Write it into `programs/noctalia/config.toml`:
-  ```sh
-  noctalia-changes --save
-  ```
-- Look at what was added:
-  ```sh
-  cd ~/flakeos
-  ```
-  ```sh
-  git add -A
-  ```
-  ```sh
-  git diff HEAD
-  ```
-- Rebuild, so the repo is what runs:
-  ```sh
-  nrs
-  ```
-- Drop noctalia's copy, now that the same settings come from the repo:
-  ```sh
-  noctalia-changes --clear
-  ```
-
-**That last step matters.** Skip it and the setting sits in both files with
-the same value - which looks fine, until you change it in `config.toml` one
-day and nothing happens, because noctalia's own file still wins. (The same
-trap as `dconf reset` below.) `--clear` keeps a copy next to the file
-(`settings.toml.bak`), and noctalia notices within a second: it falls back to
-the config from the last rebuild, so nothing on screen changes.
-
-Good to know:
-- Don't want everything it found? Run `noctalia-changes` without `--save`
-  and copy just the parts you want into `config.toml` by hand. Or save, then
-  undo parts in Zed's git panel.
-- Something that keeps showing up and should never be in the repo (the
-  wallpaper you picked, for example) goes on an `# ignore:` line in
-  `config.toml`. Deleting the line from `config.toml` is not enough - it is
-  still in noctalia's file, so the next `--save` writes it back.
-- New settings are added at the end of their section; move them if it reads
-  better.
-- Colours and fonts are not in the settings window: they come from the
-  palette (`system/theme/palette.nix`).
-- A change to a bar lane saves that whole lane (`start`, `center` or `end`),
-  because a list can only be replaced as a whole; that's normal.
-- The rebuild is what makes the new `config.toml` reach noctalia, but the
-  running shell keeps the old one until it restarts. To see repo-side changes
-  without logging out:
-  ```sh
-  pkill -x noctalia
-  ```
-  ```sh
-  niri msg action spawn -- noctalia
-  ```
-
-## Keeping GTK app settings (dconf)
-
-**How it works:** most programs here are *wrapped* — their config is a file
-in this repo, baked in at rebuild. But some programs have no config file at
-all. Rnote, Shortwave, virt-manager and the GTK file-picker keep everything
-in **dconf**: a settings database in `~/.config/dconf/user`. It is not a
-text file, it is not in the repo, and on a fresh install it starts empty, so
-every pen, colour and preference you set up is gone.
-
-This config can put settings into dconf as well. They land in
-`/etc/dconf/db/`, *underneath* your own copy:
-
-| where | what it is |
-|---|---|
-| `~/.config/dconf/user` | what you changed in the program. This one wins. |
-| `/etc/dconf/db/…` | what this repo installs. Used until you change it. |
-
-So a saved setting is what the program *starts out* with, and changing it in
-the program still works. `dconf-changes` is the bridge: it shows what you
-changed and writes it into the repo.
-
-Here is a quick overview of the dconf helper commands with the rnote example.
-More details further down in this section.
-dconf-changes                  which programs did I change something in?
-dconf-changes rnote            show those changes
-dconf-changes rnote --save     write them to modules/programs/rnote/dconf/rnote
-dconf-changes rnote --all      also show keys the repo already sets
-
-### Does my program work this way?
-
-There is no list to look up — just try it. Change something in the program,
-close it, then:
-
-```sh
-dconf-changes
+```toml
+[wallpaper.automation]
+enabled = true
+interval_seconds = 1800
+order = "random"
 ```
-
-- The program is in the list → it uses dconf, carry on below.
-- Not in the list → look for a config file instead:
-  ```sh
-  ls ~/.config
-  ```
-  A folder with your program's name means it writes a config file, and that
-  is a different job (a wrapper, see
-  [`blueprints/README.md`](blueprints/README.md)). Nothing at all? Then it
-  saves somewhere of its own; Steam, Lutris and Firefox profiles are like
-  that, and they are not worth chasing.
-
-The four ways a program's settings are kept here:
-
-| kind | example | kept by |
-|---|---|---|
-| takes a config file or option | niri, alacritty, mpv | wrapping it — the file lives in `modules/programs/<name>/` |
-| dconf, no config file | rnote, Shortwave, virt-manager | `dconf-changes <name> --save` |
-| reads `/etc/xdg/…` as well as `~/.config` | Thunar's right-click menu, GTK fonts | `environment.etc."xdg/…"` in the module |
-| own format, own place | Steam, Firefox profiles | not kept — set it up again |
-
-### Saving what you changed
-
-- Set the program up the way you like it, then close it.
-- See what you changed (`rnote` is the name of its folder in
-  `modules/programs/`):
-  ```sh
-  dconf-changes rnote
-  ```
-- Write it into the repo:
-  ```sh
-  dconf-changes rnote --save
-  ```
-  It goes to `modules/programs/rnote/dconf/rnote`.
-- Throw out what you don't want to keep. Window sizes and "last opened"
-  paths end up in there too — open the file:
-  ```sh
-  zeditor ~/flakeos/modules/programs/rnote/dconf/rnote
-  ```
-  **Deleting the line is not enough.** The setting is still in your own copy
-  of dconf, so the next `--save` puts it straight back. Delete the line *and*
-  write the key on the `# ignore:` line at the top of the file (several keys
-  separated by spaces, or several `# ignore:` lines) — that is how
-  `rnote/dconf/rnote` keeps `window-width` and friends out for good.
-- New file? Tell git, look at it, rebuild:
-  ```sh
-  cd ~/flakeos
-  ```
-  ```sh
-  git add -A
-  ```
-  ```sh
-  git diff HEAD
-  ```
-  ```sh
-  nrs
-  ```
-- **Only for a program that has never had a `dconf/` folder:** the module
-  has to load it. One line in `modules/programs/rnote/rnote.nix`, inside the
-  `flake.nixosModules.rnote = { … }` block (`rnote.nix` already has it —
-  copy from there):
-  ```nix
-  programs.dconf.profiles.user.databases = [{keyfiles = [./dconf];}];
-  ```
-
-### Good to know
-
-- **Your own copy still wins.** After the rebuild the setting is in the repo
-  *and* still in `~/.config/dconf/user`, so nothing looks different — but
-  editing the repo file by hand now does nothing. To hand control over to
-  the repo, close the program and drop your copy:
-  ```sh
-  dconf reset -f /com/github/flxzt/rnote/
-  ```
-  `dconf-changes --save` prints the exact path to use. It clears *everything*
-  under that path that you did not save, which is the point, but check the
-  file first.
-- The saved file is dconf's own format, one line per setting, exactly what
-  `dconf dump` prints. Nothing is translated, so nothing can be translated
-  wrong — but some programs (rnote) squeeze all their settings into one very
-  long line. That is normal.
-- A key on an `# ignore:` line is never saved, and never shown by
-  `dconf-changes <program>` either — so what you see is what you get.
-  `--all` shows it anyway.
-- `--save` **merges**: your comments and settings you saved earlier stay,
-  only the keys you just changed are replaced. Saving twice in a row changes
-  nothing.
-- Settings that already match the repo are left out, so you only ever see
-  what is actually new. `dconf-changes rnote --all` shows them anyway.
-- These settings are for everyone on the machine, like a wrapped config.
-- Want the repo to win *always*, GUI or not? Add `lockAll = true;` next to
-  `keyfiles`. The program's setting then can't be changed any more, so this
-  is for things that must not drift, not for everyday use.
-
-## Gaming
-
-Steam comes with Proton-GE (Steam → a game → Properties → Compatibility).
-Three helpers go into a game's **launch options** (Steam → a game →
-Properties → General):
-
-| launch options | does |
-|---|---|
-| `gamemoderun %command%` | GameMode: CPU/GPU in performance mode while the game runs |
-| `mangohud %command%` | in-game overlay: FPS, temperatures, load (toggle: Right Shift + F12) |
-| `gamescope -W 2560 -H 1440 -f -- %command%` | runs the game inside its own small compositor: fixed resolution, upscaling, frame limit (helps games that struggle with fullscreen or resolution) |
-
-They can be combined: `gamemoderun mangohud %command%`.
-
-- The very first Steam start downloads ~500 MB of updates, it just looks
-  stuck. Wait.
-- Minecraft: Prism Launcher. Battle.net, GOG and emulators: Lutris.
-
-## Virtual machines
-
-Another operating system in a window, at nearly the speed of the real
-hardware: KVM and QEMU run it, libvirt keeps it, and **Virtual Machine
-Manager** in the launcher is where you click. `grouped/vm.nix` has already done
-the setup every other guide makes you do by hand.
-
-Creating a machine, the settings that matter, the guest side, the screen and
-the clipboard: [`modules/programs/virt-manager/README.md`](modules/programs/virt-manager/README.md).
-
-## Saving changes to GitHub
-
-**How it works:** git keeps the history of the repo. A *commit* is a saved
-snapshot with a short message, *push* uploads your commits to GitHub,
-*pull* downloads commits made on the other machine. Zed's git panel does all
-of this with buttons; in a terminal:
-
-- Go to the repo:
-  ```sh
-  cd ~/flakeos
-  ```
-- See what changed:
-  ```sh
-  git status
-  ```
-- Mark everything for the next commit (new files too):
-  ```sh
-  git add -A
-  ```
-- Save a snapshot with a short description:
-  ```sh
-  git commit -m "what I changed"
-  ```
-- Upload to GitHub:
-  ```sh
-  git push
-  ```
-- On the other machine, get the changes (then `nrs`):
-  ```sh
-  git pull
-  ```
-
-Pushing uses your SSH key `~/.ssh/id_ed25519`, never a password or token.
-`programs/git/gitconfig` sends pushes to GitHub over SSH, even though the
-repo was cloned with an `https://` URL, and `programs/git/git.nix` already
-trusts GitHub's host key. So once the key is on the machine, pushing from
-Zed just works. `ssh -T git@github.com` checks the key: it should answer
-"Hi slider104!". No key yet, or your own GitHub repo? See
-[the install guide](modules/setup/README.md#optional-your-own-github-repo).
-
-## Two machines
-
-**How it works:** GitHub is the meeting point. Each machine has its own copy
-of the repo, and they only line up once one machine pushes and the other
-pulls. `programs/git/gitconfig` sets `pull.rebase = true`: when both machines
-made commits, a pull puts your local commits on top of the ones from GitHub,
-so the history stays a straight line.
-
-- Before editing on a machine, get the latest state first. This avoids most
-  trouble:
-  ```sh
-  git pull
-  ```
-- Changed something on machine A: commit and push there, then on machine B:
-  ```sh
-  git pull
-  nrs
-  ```
-- B has uncommitted changes, so the pull refuses ("cannot pull with rebase:
-  You have unstaged changes"). Commit them first, or park them during the
-  pull:
-  ```sh
-  git pull --autostash
-  ```
-- Both machines made commits: `git pull` on B stacks B's commits on top,
-  then `git push` from B and `git pull` on A.
-- Both changed the same lines: the pull stops with a conflict. Fix the file
-  (git marks the spot with `<<<<<<<` and `>>>>>>>`), then:
-  ```sh
-  git add <file>
-  git rebase --continue
-  ```
-  Or give up and go back to how it was before the pull:
-  ```sh
-  git rebase --abort
-  ```
-- Updates: run `nup` on **one** machine only, commit and push `flake.lock`.
-  The other machine pulls and runs `nrs`, and gets exactly the same versions.
-  Ran `nup` on both and now `flake.lock` conflicts? Keep the one from GitHub
-  (in a rebase, `--ours` is the GitHub side), then `nrs` so this machine
-  builds those versions instead of its own discarded update:
-  ```sh
-  git checkout --ours flake.lock
-  git add flake.lock
-  git rebase --continue
-  nrs
-  ```
-  `flake.lock` is a normal file in git: after a pull, both machines have the
-  same one. They only drift apart if one runs `nup` and doesn't push.
 
 ## Something broke?
 
-Broke right after an update? [How risky is an update?](#how-risky-is-an-update)
-sorts the four cases and the way back out of each one.
+Short answers:
 
-- **The rebuild failed:** nothing changed, you're still on the old system.
-  The last lines of the error name the file and line. The full output is in
+- **The rebuild failed:** nothing changed, you're still on the old system. The
+  last lines of the error name the file and line; the full output is in
   `~/flakeos/logs/`.
-- **A package failed to build after an update:** probably not your doing -
-  unstable had a bad day. See [When a package doesn't build](#when-a-package-doesnt-build).
-- **The rebuild worked, but now something is broken:** reboot, and in the
-  boot menu (shown for 5 seconds) pick an older generation. Fix the file,
-  `nrs` again.
-- **A change doesn't show up:** new file not `git add`ed? Program still
-  open from before the rebuild? (see [Changing something](#changing-something))
-- **root is locked** (installed with `--no-root-passwd`): there is no root
-  login and no `su`; `sudo` with your own password does everything.
-- **Locked out?** A rebuild broke sudo → boot an older generation. Forgot
-  your password (passwords aren't part of generations) → boot the NixOS
-  installer USB stick, then:
-  ```sh
-  sudo mount /dev/disk/by-partlabel/disk-main-root /mnt
-  ```
-  ```sh
-  sudo nixos-enter --root /mnt -c 'passwd slider'
-  ```
-  ```sh
-  reboot
-  ```
+- **The rebuild worked, but now something is broken:** reboot, and in the boot
+  menu (shown for 5 seconds) pick an older generation. Fix the file, `nrs`
+  again.
+- **A change doesn't show up:** new file not `git add`ed? Program still open
+  from before the rebuild?
+
+The long answers — all the logs, every service, the rollbacks, and what to do
+when you're locked out — are in
+[wiki/troubleshoot.md](wiki/troubleshoot.md).

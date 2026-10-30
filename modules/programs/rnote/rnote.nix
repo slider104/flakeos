@@ -7,8 +7,8 @@
   # So the dconf/ folder next to this file holds those settings, and they are
   # installed as *defaults*: rnote starts out the way you set it up, and
   # changing something in rnote still works and wins from then on. To keep a
-  # change you made: `dconf-changes rnote --save` (see README.md, "Keeping GTK
-  # app settings (dconf)").
+  # change you made: `dconf-changes rnote --save` (see wiki/settings.md,
+  # "dconf: GTK apps with no config file").
   #
   # It registers itself for its own .rnote files.
   flake.nixosModules.rnote = {pkgs, ...}: {

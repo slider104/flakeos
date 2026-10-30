@@ -4,7 +4,7 @@
   ...
 }: {
   # BLUEPRINT: a machine.
-  # How to use it: blueprints/README.md
+  # How to use it: wiki/blueprints.md
   # Real ones in this repo: hosts/zeus/, hosts/hermes/.
   #
   # Build or switch with:  sudo nixos-rebuild switch --flake .#example

@@ -20,7 +20,7 @@
       # copied something, so the clipboard stops travelling to the guest as
       # soon as the guest copies anything. On XWayland it sees every change,
       # and niri-clipboard-bridge (programs/niri) carries the clipboard between
-      # XWayland and niri. See README.md next to this file, "The clipboard".
+      # XWayland and niri. See wiki/virtualisation.md, "The clipboard".
       package = pkgs.symlinkJoin {
         name = "virt-manager-x11";
         paths = [pkgs.virt-manager];
@@ -61,7 +61,7 @@
             };
 
             # The guest's resolution follows the window while you resize it.
-            # Needs the guest agent inside the guest, see README.md next to this file.
+            # Needs the guest agent inside the guest, see wiki/virtualisation.md.
             "org/virt-manager/virt-manager/console".resize-guest = lib.gvariant.mkInt32 1;
 
             # Show the XML tab in a machine's details: every knob libvirt has,

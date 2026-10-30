@@ -109,7 +109,7 @@ in {
       # XWayland has its own clipboard, and xwayland-satellite does not carry
       # what an X11 program copies over to niri, nor the other way round. This
       # mirrors the two in both directions - X11 programs in general, and the
-      # clipboard of a virtual machine (programs/virt-manager/README.md), which
+      # clipboard of a virtual machine (wiki/virtualisation.md), which
       # travels through XWayland on both machines. The two comparisons stop the
       # halves from bouncing the same value back and forth forever.
       (writeShellScriptBin "niri-clipboard-bridge" ''

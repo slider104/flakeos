@@ -3,7 +3,7 @@
   wrappers = config.flake.wrappers;
 in {
   # BLUEPRINT: a program wrapped with a READY-MADE module from nix-wrapper-modules.
-  # How to use it: blueprints/README.md
+  # How to use it: wiki/blueprints.md
   #
   # Is there a ready-made module for your program? Check the list:
   #   https://nix-community.github.io/nix-wrapper-modules/

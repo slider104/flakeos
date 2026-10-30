@@ -24,7 +24,7 @@ in {
   #   5. `pkill -f 'bin/noctalia$' && noctalia -d` restarts the shell
   #      (`pkill -x noctalia` finds nothing: the wrapper execs a binary
   #      called .noctalia-wrapped, so that is the process name)
-  # (see noctalia-changes.py next to this file, and the README)
+  # (see noctalia-changes.py next to this file, and wiki/noctalia.md)
   #
   # Step 5 is not optional: a rebuild does not reach the running noctalia.
   # NOCTALIA_CONFIG_HOME is a store path fixed in its environment when the

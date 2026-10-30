@@ -1,6 +1,6 @@
 {self, ...}: {
   # BLUEPRINT: a bundle of modules a host can pick with one name.
-  # How to use it: blueprints/README.md
+  # How to use it: wiki/blueprints.md
   # Real ones in this repo: grouped/desktop.nix, grouped/gaming.nix.
   #
   # A bundle only lists names. Each name is a `flake.nixosModules.<name>`

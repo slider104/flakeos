@@ -2,7 +2,7 @@
   wrappers = config.flake.wrappers;
 in {
   # BLUEPRINT: a program wrapped by hand, for when there is NO ready-made module.
-  # How to use it: blueprints/README.md
+  # How to use it: wiki/blueprints.md
   # Real ones in this repo: programs/mangohud/ (two lines) and
   # programs/noctalia/ (the same idea, with a settings file and its own option).
   #

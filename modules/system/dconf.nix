@@ -11,7 +11,7 @@
   #
   # `dconf-changes` (below) is the bridge: it shows what you changed and
   # writes it into the repo, so the next machine starts out the same way.
-  # See README.md, "Keeping GTK app settings (dconf)".
+  # See wiki/settings.md, "dconf: GTK apps with no config file".
   flake.nixosModules.dconf = {pkgs, ...}: let
     dconfChanges = pkgs.writeShellApplication {
       name = "dconf-changes";
